@@ -1,0 +1,8 @@
+name: CmdApi2
+version: '${version}'
+
+main: com.github.DasJava005.cmdApi.Main
+api-version: '1.21'
+load: POSTWORLD
+
+authors: [ DasJava ]
