@@ -1,6 +1,9 @@
-package com.github.DasJava005.cmdApi;
+package com.github.DasJava005.cmdApi.testplugin;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
+import com.github.DasJava005.cmdApi.Command;
+import com.github.DasJava005.cmdApi.CommandBuilder;
+import com.github.DasJava005.cmdApi.CommandRegistry;
 import com.github.DasJava005.cmdApi.input.InputArguments;
 import com.github.DasJava005.cmdApi.input.LiteralArgument;
 import net.kyori.adventure.text.Component;
@@ -17,16 +20,17 @@ import org.bukkit.util.Vector;
 import java.util.UUID;
 import java.util.concurrent.Executor;
 
-public final class Main extends JavaPlugin {
+public final class TestPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
         CommandRegistry registry = new CommandRegistry(this);
-        registry.registerCommands(createItemCommand().create(), createTablistCommand().create(), createSkinCommand(), createSummonCommand());
 
-        CommandBuilder.of("test_abc")
-                .argument(InputArguments.UUID.createArgument("jo"));
-
+        registry.registerCommands(createItemCommand().create(),
+                createTablistCommand().create(),
+                createSkinCommand(),
+                createSummonCommand(),
+                createMessageCommand().create());
     }
 
     public Executor getMainThread() {
@@ -92,6 +96,17 @@ public final class Main extends JavaPlugin {
                     Location location = new Location(p.getWorld(), pos.getX(), pos.getY(), pos.getZ());
                     p.getWorld().spawnEntity(location, type);
                 }).create();
+    }
+
+    public CommandBuilder createMessageCommand(){
+        return CommandBuilder.of("message")
+                .literal("send")
+                .argument(InputArguments.createGreedyArgument("msg"))
+                .executor(ctx ->{
+                    Player p = ctx.getSender(Player.class);
+                    String msg = ctx.get("msg", String.class);
+                    p.sendMessage(msg);
+                });
     }
 
     @Override

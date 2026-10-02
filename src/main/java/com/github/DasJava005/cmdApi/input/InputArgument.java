@@ -6,11 +6,9 @@ import org.bukkit.command.CommandSender;
 
 import java.util.List;
 
-public non-sealed interface InputArgument<T> extends Argument {
-
+public non-sealed interface InputArgument<T> extends Argument, Parser<T> {
 
     public abstract String key();
-    public abstract T parse(String[] tokens);
 
     public static <T> InputArgument<T> create(String key, Parser<T> parser) {
         return InputArgument.create(key, parser, (sender, tokens) -> List.of());

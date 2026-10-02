@@ -1,9 +1,6 @@
 package com.github.DasJava005.cmdApi;
 
-import com.github.DasJava005.cmdApi.input.Argument;
-import com.github.DasJava005.cmdApi.input.Arguments;
-import com.github.DasJava005.cmdApi.input.InputArgument;
-import com.github.DasJava005.cmdApi.input.LiteralArgument;
+import com.github.DasJava005.cmdApi.input.*;
 import org.bukkit.command.CommandSender;
 import org.jspecify.annotations.NonNull;
 
@@ -47,7 +44,7 @@ public final class CommandDispatcher {
             case MatchResult.ParseFailure fail -> {
                 Exception e = fail.exception();
                 if(e != null) {
-                    commandSender.sendMessage("[!] Could not parse arguments. " + e.getMessage()); // this mainly contains ParseExceptions and the one above
+                    commandSender.sendMessage("[!] Could not parse arguments. " + e.getMessage());
                 }
                 return false;
             }
@@ -63,8 +60,9 @@ public final class CommandDispatcher {
     }
 
     private MatchResult matchArguments(Command command, String[] tokens) {
-        int i = 0; // the i-th token
         final Map<String, Object> ctxValues = new HashMap<>();
+
+        int i = 0; // the i-th token
         for(Argument arg : command.arguments().getDefinitions()) {
             switch (arg) {
 
@@ -87,10 +85,16 @@ public final class CommandDispatcher {
                     i += inputArgument.tokenConsumeCount();
                 }
 
+                case GreedyArgument greedyArgument -> {
+                    final String[] parseArguments = Arrays.copyOfRange(tokens, i, tokens.length);
+                    String str = greedyArgument.parse(parseArguments);
+                    ctxValues.put(greedyArgument.key(), str);
+                }
+
             }
         }
 
-        if (i != tokens.length) { // user provided too many tokens
+        if (i != tokens.length && !command.arguments().hasGreedyArgument()) { // user provided too many tokens
             return MatchResult.noMatch();
         }
 
@@ -104,7 +108,7 @@ public final class CommandDispatcher {
             if (!command.sender().isInstance(commandSender)) continue;
             if(tokens.length > command.arguments().tokenConsumeCount()) continue;
 
-            final Arguments arguments = command.arguments();
+            final CommandArguments arguments = command.arguments();
 
             Argument lastArgument = arguments.getAtToken(tokens.length - 1);
             if (lastArgument == null) continue;

@@ -1,11 +1,10 @@
 package com.github.DasJava005.cmdApi.input;
 
-import com.github.DasJava005.cmdApi.Parser;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;
 
-public sealed interface Argument permits InputArgument, LiteralArgument {
+public sealed interface Argument permits GreedyArgument, InputArgument, LiteralArgument {
 
     /**
      * Returns the number of tokens consumed by this argument.

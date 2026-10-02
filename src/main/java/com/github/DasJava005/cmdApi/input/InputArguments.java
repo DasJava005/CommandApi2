@@ -48,6 +48,7 @@ public enum InputArguments {
 
     private final Class<?> type;
     private final InputArgumentFactory<?> factory;
+
     private <T> InputArguments(Class<T> type, InputArgumentFactory<T> factory){
         this.type = type;
         this.factory = factory;
@@ -63,6 +64,10 @@ public enum InputArguments {
 
     public InputArgument<?> createArgument(String key) {
         return factory.create(key);
+    }
+
+    public static GreedyArgument createGreedyArgument(String key){
+        return new GreedyArgument(key);
     }
 
 }

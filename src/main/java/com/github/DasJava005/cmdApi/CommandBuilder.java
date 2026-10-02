@@ -1,7 +1,6 @@
 package com.github.DasJava005.cmdApi;
 
 import com.github.DasJava005.cmdApi.input.Argument;
-import com.github.DasJava005.cmdApi.input.Arguments;
 import com.github.DasJava005.cmdApi.input.LiteralArgument;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -80,7 +79,7 @@ public final class CommandBuilder {
 
     public Command create() {
         return new Command(new CommandInfo(label, aliases, permission, description),
-                new Arguments(arguments),
+                new CommandArguments(arguments),
                 sender,
                 executor);
     }

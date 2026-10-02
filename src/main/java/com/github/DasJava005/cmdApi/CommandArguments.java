@@ -1,9 +1,12 @@
-package com.github.DasJava005.cmdApi.input;
+package com.github.DasJava005.cmdApi;
+
+import com.github.DasJava005.cmdApi.input.Argument;
+import com.github.DasJava005.cmdApi.input.GreedyArgument;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public final class Arguments {
+public final class CommandArguments {
 
     private final List<Argument> definitions;
     private boolean hasGreedyArgument = false;
@@ -18,7 +21,7 @@ public final class Arguments {
      */
     private final List<Argument> argumentsByToken;
 
-    public Arguments(List<Argument> arguments) {
+    public CommandArguments(List<Argument> arguments) {
         this.definitions = List.copyOf(arguments);
 
         List<Argument> byToken = new ArrayList<>();

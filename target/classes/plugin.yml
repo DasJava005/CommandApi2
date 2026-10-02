@@ -1,8 +1,7 @@
 name: CmdApi2
 version: '1.0-SNAPSHOT'
 
-main: com.github.DasJava005.cmdApi.Main
+main: com.github.DasJava005.cmdApi.testplugin.TestPlugin
 api-version: '1.21'
-load: POSTWORLD
 
 authors: [ DasJava ]

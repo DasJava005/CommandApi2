@@ -1,30 +1,22 @@
 package com.github.DasJava005.cmdApi.input;
 
-public class GreedyArgument implements InputArgument<String> {
+import com.github.DasJava005.cmdApi.Parser;
 
-    private final String key;
-
-    public GreedyArgument(String key){
-        this.key = key;
-    }
+public record GreedyArgument(String key) implements Argument, Parser<String> {
 
     @Override
-    public String key() {
-        return key;
+    public String parse(String[] tokens) {
+        StringBuilder builder = new StringBuilder();
+        for (String s : tokens) {
+            builder.append(" ").append(s);
+        }
+        return builder.toString();
     }
 
     @Override
     public final int tokenConsumeCount() {
-        return 1;
-    }
-
-    @Override
-    public String parse(String[] tokens) {
-        StringBuilder sb = new StringBuilder();
-        for(String token : tokens){
-            sb.append(" ").append(token);
-        }
-        return sb.toString();
+        return -1;
     }
 
 }
+

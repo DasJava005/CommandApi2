@@ -1,10 +1,9 @@
 com\github\DasJava005\cmdApi\CommandDispatcher.class
 com\github\DasJava005\cmdApi\input\InputArgument$1.class
-com\github\DasJava005\cmdApi\input\GreedyArgument$1.class
 com\github\DasJava005\cmdApi\input\InputArgumentFactory.class
 com\github\DasJava005\cmdApi\Parser.class
+com\github\DasJava005\cmdApi\CommandArguments.class
 com\github\DasJava005\cmdApi\utils\Primitives.class
-com\github\DasJava005\cmdApi\input\Arguments.class
 com\github\DasJava005\cmdApi\input\factory\AbstractInputArgumentFactory.class
 com\github\DasJava005\cmdApi\MatchResult$NoMatch.class
 com\github\DasJava005\cmdApi\reflection\InputArgumentRegistry.class
@@ -15,13 +14,14 @@ com\github\DasJava005\cmdApi\input\LiteralArgument.class
 com\github\DasJava005\cmdApi\Suggestions.class
 com\github\DasJava005\cmdApi\MatchResult.class
 com\github\DasJava005\cmdApi\CommandRegistry$1.class
-com\github\DasJava005\cmdApi\Main.class
 com\github\DasJava005\cmdApi\CommandInfo.class
 com\github\DasJava005\cmdApi\input\factory\VectorInputArgumentFactory.class
 com\github\DasJava005\cmdApi\input\InputArguments.class
 com\github\DasJava005\cmdApi\CommandRegistry.class
 com\github\DasJava005\cmdApi\CommandContext.class
+com\github\DasJava005\cmdApi\testplugin\TestPlugin.class
 com\github\DasJava005\cmdApi\input\factory\BooleanArgumentFactory.class
+com\github\DasJava005\cmdApi\input\TokenConsumer.class
 com\github\DasJava005\cmdApi\input\factory\MaterialInputArgumentFactory.class
 com\github\DasJava005\cmdApi\CommandBuilder.class
 com\github\DasJava005\cmdApi\CommandProvider.class
