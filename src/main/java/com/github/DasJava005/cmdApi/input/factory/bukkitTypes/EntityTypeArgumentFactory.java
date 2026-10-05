@@ -1,6 +1,7 @@
-package com.github.DasJava005.cmdApi.input.factory;
+package com.github.DasJava005.cmdApi.input.factory.bukkitTypes;
 
 import com.github.DasJava005.cmdApi.ParseException;
+import com.github.DasJava005.cmdApi.input.factory.AbstractInputArgumentFactory;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
 

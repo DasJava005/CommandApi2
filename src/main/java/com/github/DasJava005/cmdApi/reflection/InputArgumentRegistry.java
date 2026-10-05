@@ -35,4 +35,8 @@ public final class InputArgumentRegistry {
         return Optional.of((InputArgument<T>) registry.get(clazz).create(key));
     }
 
+    public boolean supports(Class<?> clazz) {
+        return registry.containsKey(clazz);
+    }
+
 }

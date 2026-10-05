@@ -1,11 +1,12 @@
-package com.github.DasJava005.cmdApi.input.factory;
+package com.github.DasJava005.cmdApi.input.factory.simpleTypes;
 
 import com.github.DasJava005.cmdApi.ParseException;
+import com.github.DasJava005.cmdApi.input.factory.AbstractInputArgumentFactory;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;
 
-public class BooleanArgumentFactory extends AbstractInputArgumentFactory<Boolean> {
+public class BooleanInputArgumentFactory extends AbstractInputArgumentFactory<Boolean> {
 
     @Override
     protected Boolean parse(String[] tokens) {

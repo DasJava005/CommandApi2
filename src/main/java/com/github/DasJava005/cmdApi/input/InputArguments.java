@@ -1,10 +1,10 @@
 package com.github.DasJava005.cmdApi.input;
 
 import com.github.DasJava005.cmdApi.ParseException;
-import com.github.DasJava005.cmdApi.input.factory.BooleanArgumentFactory;
-import com.github.DasJava005.cmdApi.input.factory.EntityTypeArgumentFactory;
-import com.github.DasJava005.cmdApi.input.factory.MaterialInputArgumentFactory;
-import com.github.DasJava005.cmdApi.input.factory.VectorInputArgumentFactory;
+import com.github.DasJava005.cmdApi.input.factory.simpleTypes.*;
+import com.github.DasJava005.cmdApi.input.factory.bukkitTypes.EntityTypeArgumentFactory;
+import com.github.DasJava005.cmdApi.input.factory.bukkitTypes.MaterialInputArgumentFactory;
+import com.github.DasJava005.cmdApi.input.factory.bukkitTypes.VectorInputArgumentFactory;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.util.Vector;
@@ -16,31 +16,11 @@ import java.util.UUID;
  */
 public enum InputArguments {
 
-    STRING(String.class, key -> InputArgument.create(key, tokens -> {
-        StringBuilder builder = new StringBuilder();
-        for (String s : tokens) {
-            builder.append(" ").append(s);
-        }
-        return builder.toString();
-    })),
-
-    INTEGER(Integer.class, key -> InputArgument.create(key, tokens -> {
-        try{
-            return Integer.parseInt(tokens[0]);
-        }catch (Exception e) {
-            throw new ParseException(tokens[0], Integer.class);
-        }
-    })),
-
-    BOOLEAN(Boolean.class, new BooleanArgumentFactory()),
-
-    UUID(UUID.class, key -> InputArgument.create(key, tokens ->{
-        try{
-            return java.util.UUID.fromString(tokens[0]);
-        }catch (IllegalArgumentException iae){
-            throw new ParseException(tokens[0], UUID.class);
-        }
-    })),
+    STRING(String.class, new StringInputArgumentFactory()),
+    INTEGER(Integer.class, new IntegerInputArgumentFactory()),
+    DOUBLE(Double.class, new DoubleInputArgumentFactory()),
+    BOOLEAN(Boolean.class, new BooleanInputArgumentFactory()),
+    UUID(UUID.class, new UuidInputArgumentFactory()),
 
     MATERIAL(Material.class, new MaterialInputArgumentFactory()),
     VECTOR(Vector.class, new VectorInputArgumentFactory()),
@@ -64,10 +44,6 @@ public enum InputArguments {
 
     public InputArgument<?> createArgument(String key) {
         return factory.create(key);
-    }
-
-    public static GreedyArgument createGreedyArgument(String key){
-        return new GreedyArgument(key);
     }
 
 }

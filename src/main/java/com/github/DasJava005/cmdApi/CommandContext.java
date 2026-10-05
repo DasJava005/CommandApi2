@@ -14,7 +14,7 @@ public class CommandContext {
         this.arguments = arguments;
     }
 
-    public <T extends CommandSender> T getSender(Class<T> senderClazz) {
+    public <T> T getSender(Class<T> senderClazz) {
         if(!senderClazz.isInstance(this.sender))
             throw new IllegalArgumentException("Sender must be of type " + senderClazz.getName());
 
@@ -24,7 +24,6 @@ public class CommandContext {
     public <T> T get(String key, Class<T> clazz) {
         if (!arguments.containsKey(key))
             throw new IllegalArgumentException("Missing argument: " + key);
-
 
         Object value = arguments.get(key);
 

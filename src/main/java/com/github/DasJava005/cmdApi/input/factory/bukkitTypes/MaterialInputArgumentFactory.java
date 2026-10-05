@@ -1,6 +1,7 @@
-package com.github.DasJava005.cmdApi.input.factory;
+package com.github.DasJava005.cmdApi.input.factory.bukkitTypes;
 
 import com.github.DasJava005.cmdApi.ParseException;
+import com.github.DasJava005.cmdApi.input.factory.AbstractInputArgumentFactory;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 
@@ -30,8 +31,7 @@ public class MaterialInputArgumentFactory extends AbstractInputArgumentFactory<M
     @Override
     protected List<String> suggest(CommandSender sender, String[] tokens) {
         String input = tokens[0];
-        return materials.stream().filter(mat -> mat.regionMatches(true, 0, input, 0, input.length()
-        )).toList();
+        return materials.stream().filter(mat -> mat.regionMatches(true, 0, input, 0, input.length())).toList();
     }
 
 }

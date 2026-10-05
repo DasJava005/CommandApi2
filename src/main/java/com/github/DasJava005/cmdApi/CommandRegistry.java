@@ -22,12 +22,12 @@ public final class CommandRegistry {
     }
 
     public void registerCommand(Command command) {
-        if(!commands.containsKey(command.label())){
-            registerAsBukkitCommand(command.getCommandInfo());
+        if(!commands.containsKey(command.commandInfo().label())){
+            registerAsBukkitCommand(command.commandInfo());
         }
 
-        HashSet<String> keys = new HashSet<>(command.getCommandInfo().aliases());
-        keys.add(command.getCommandInfo().label());
+        HashSet<String> keys = new HashSet<>(command.commandInfo().aliases());
+        keys.add(command.commandInfo().label());
 
         for(String key : keys){
             commands.computeIfAbsent(key, _ -> new ArrayList<>()).add(command);
