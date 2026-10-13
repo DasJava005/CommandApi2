@@ -2,6 +2,7 @@ package com.github.DasJava005.cmdApi.reflection;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 public class CommandSyntax {
 
@@ -12,9 +13,13 @@ public class CommandSyntax {
     }
 
     public Iterator<CommandToken> tokens() {
+        return tokenList().iterator();
+    }
+
+    public List<CommandToken> tokenList() {
         return Arrays.stream(syntax.split("\\s+"))
                 .map(CommandToken::new)
-                .iterator();
+                .toList();
     }
 
     public static final class CommandToken {
@@ -33,13 +38,14 @@ public class CommandSyntax {
             return !isInput();
         }
 
-        public String getToken(){
+        public String getToken() {
             if(isLiteral()){
                 return token;
             }else{
                 return token.replaceFirst("#", "");
             }
         }
+
     }
 
 }

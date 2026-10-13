@@ -47,7 +47,7 @@ public class ReflectiveCommandBuilder {
 
         CommandSyntax commandSyntax = new CommandSyntax(syntax);
 
-        HashMap<String, Parameter> parameters = getParameters(commandMethod.method());
+        HashMap<String, Parameter> parameters = getArgAnnotatedParameters(commandMethod.method());
 
         //build arguments from syntax
         List<Argument> arguments = new ArrayList<>();
@@ -75,22 +75,23 @@ public class ReflectiveCommandBuilder {
 
         CommandInfo commandInfo = new CommandInfo(commandName, List.of(), "", "");
         CommandArguments commandArguments = new CommandArguments(arguments);
-        Class<?> commandSender = getSenderParameter(commandMethod.method()).getType();
+        Class<?> commandSender = getSenderAnnotatedParameter(commandMethod.method()).getType();
         CommandExecutor commandExecutor = new ReflectiveExecutor(commandMethod);
 
         return new Command(commandInfo, commandArguments, commandSender, commandExecutor);
     }
 
-    private Parameter getSenderParameter(Method method) {
+    //** TODO: remove this
+
+    private Parameter getSenderAnnotatedParameter(Method method) {
         for(Parameter p : method.getParameters()) {
-            if(p.isAnnotationPresent(Sender.class)){
+            if(p.isAnnotationPresent(Sender.class))
                 return p;
-            }
         }
         return null;
     }
 
-    private HashMap<String, Parameter> getParameters(Method m) {
+    private HashMap<String, Parameter> getArgAnnotatedParameters(Method m) {
         HashMap<String, Parameter> parameters = new HashMap<>();
         for(Parameter p : m.getParameters()) {
             if(p.isAnnotationPresent(Arg.class)){
