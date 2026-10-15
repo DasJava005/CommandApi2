@@ -5,11 +5,13 @@ import com.github.DasJava005.cmdApi.CommandArguments;
 import com.github.DasJava005.cmdApi.CommandExecutor;
 import com.github.DasJava005.cmdApi.CommandInfo;
 import com.github.DasJava005.cmdApi.input.Argument;
+import com.github.DasJava005.cmdApi.input.InputArgument;
 import com.github.DasJava005.cmdApi.input.LiteralArgument;
 import com.github.DasJava005.cmdApi.reflection.annotations.Arg;
 import com.github.DasJava005.cmdApi.reflection.annotations.Cmd;
 import com.github.DasJava005.cmdApi.reflection.annotations.CommandGroup;
 import com.github.DasJava005.cmdApi.reflection.annotations.Sender;
+import com.github.DasJava005.cmdApi.reflection.validation.CommandMethodValidator;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -18,14 +20,16 @@ import java.util.*;
 public class ReflectiveCommandBuilder {
 
     private final InputArgumentRegistry inputArgumentRegistry;
+    private final CommandMethodValidator commandMethodValidator = new CommandMethodValidator();
 
     public ReflectiveCommandBuilder(InputArgumentRegistry inputArgumentRegistry) {
         this.inputArgumentRegistry = inputArgumentRegistry;
     }
 
-    public ReflectiveCommandBuilder() {
-        this.inputArgumentRegistry = new InputArgumentRegistry();
-        this.inputArgumentRegistry.registerDefaults();
+    public static ReflectiveCommandBuilder defaultBuilder() {
+        var defaultRegistry = new InputArgumentRegistry();
+        defaultRegistry.registerDefaults();
+        return new ReflectiveCommandBuilder(defaultRegistry);
     }
 
     public Set<Command> buildCommands(Object instance){
@@ -42,32 +46,29 @@ public class ReflectiveCommandBuilder {
     }
 
     private Command buildCommand(CommandMethod commandMethod) {
-        String commandName  = commandMethod.instance().getClass().getAnnotation(CommandGroup.class).value();
-        String syntax =  commandMethod.method().getAnnotation(Cmd.class).value();
+        commandMethodValidator.validateSender(commandMethod);
+        commandMethodValidator.validateArguments(commandMethod);
 
-        CommandSyntax commandSyntax = new CommandSyntax(syntax);
+        final String commandName  = commandMethod.instance().getClass().getAnnotation(CommandGroup.class).value();
+        final CommandSyntax commandSyntax = commandMethod.getCommandSyntax();
 
         HashMap<String, Parameter> parameters = getArgAnnotatedParameters(commandMethod.method());
 
-        //build arguments from syntax
+        // build command arguments from syntax
         List<Argument> arguments = new ArrayList<>();
-
-        for (Iterator<CommandSyntax.CommandToken> it = commandSyntax.tokens(); it.hasNext();) {
-            CommandSyntax.CommandToken token = it.next();
-            if(token.isLiteral()){
+        for (CommandSyntax.CommandToken token : commandSyntax.tokens()) {
+            if (token.isLiteral()) {
                 arguments.add(new LiteralArgument(token.getToken()));
                 continue;
             }
-            if(token.isInput()){
+            if (token.isArgument()) {
                 String key = token.getToken();
-                if(!parameters.containsKey(key))
-                    throw new IllegalArgumentException(String.format("%s is not annotated with @Cmd", commandMethod.method().getName()));
 
                 Parameter p = parameters.get(key);
                 var optInputArgument = inputArgumentRegistry.create(key, p.getType());
-                if(optInputArgument.isPresent()){
+                if (optInputArgument.isPresent()) {
                     arguments.add(optInputArgument.get());
-                }else{
+                } else {
                     throw new IllegalArgumentException("not supported type: " + p.getType());
                 }
             }

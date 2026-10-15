@@ -17,4 +17,10 @@ public class TestAnnotationCommand {
 
     }
 
+    // this must throw an exception
+    /*
+    @Cmd("#user #user")
+    public void testUser(@Sender Player executor, @Arg("username") String username, @Arg("password") String password) {}
+     */
+
 }

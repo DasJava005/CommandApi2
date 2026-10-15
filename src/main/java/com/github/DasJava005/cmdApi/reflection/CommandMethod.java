@@ -6,9 +6,7 @@ import com.github.DasJava005.cmdApi.reflection.annotations.Sender;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public record CommandMethod(Object instance, Method method) {
 
@@ -26,12 +24,12 @@ public record CommandMethod(Object instance, Method method) {
         return parameters;
     }
 
-    public HashMap<String, Parameter> getArgAnnotatedParameters() {
-        HashMap<String, Parameter> parameters = new HashMap<>();
+    public HashMap<String, List<Parameter>> getArgAnnotatedParameters() {
+        HashMap<String, List<Parameter>> parameters = new HashMap<>();
         for(Parameter p : method.getParameters()) {
             if(p.isAnnotationPresent(Arg.class)){
                 String parameterName = p.getAnnotation(Arg.class).value();
-                parameters.put(parameterName, p);
+                parameters.computeIfAbsent(parameterName, _ -> new ArrayList<>()).add(p);
             }
         }
         return parameters;

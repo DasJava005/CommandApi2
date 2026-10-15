@@ -28,13 +28,12 @@ public final class TestPlugin extends JavaPlugin {
         final InputArgumentRegistry inputArgumentRegistry = new InputArgumentRegistry();
         inputArgumentRegistry.registerDefaults();
 
-        final ReflectiveCommandBuilder builder = new ReflectiveCommandBuilder(inputArgumentRegistry);
+        var commandBuilder = ReflectiveCommandBuilder.defaultBuilder();
 
-        Set<Command> commandSet = builder.buildCommands(command);
+        Set<Command> commandSet = commandBuilder.buildCommands(command);
 
         registry.registerCommands(commandSet.toArray(new Command[0]));
     }
-
 
     @Override
     public void onDisable() {
