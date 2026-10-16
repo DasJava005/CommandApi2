@@ -44,6 +44,12 @@ public final class CommandRegistry {
         }
     }
 
+    public void registerCommands(Set<Command> commands) {
+        for(Command command : commands) {
+            registerCommand(command);
+        }
+    }
+
     public List<Command> getCommands(String name) {
         return commands.getOrDefault(name, List.of());
     }

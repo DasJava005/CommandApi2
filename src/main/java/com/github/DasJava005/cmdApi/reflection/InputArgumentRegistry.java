@@ -11,6 +11,12 @@ import java.util.Optional;
 
 public final class InputArgumentRegistry {
 
+    public static InputArgumentRegistry defaultRegistry() {
+        InputArgumentRegistry registry = new InputArgumentRegistry();
+        registry.registerDefaults();
+        return registry;
+    }
+
     private final Map<Class<?>, InputArgumentFactory<?>> registry = new HashMap<>();
 
     public <T> void register(Class<T> clazz, InputArgumentFactory<T> factory) {
@@ -28,11 +34,11 @@ public final class InputArgumentRegistry {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> Optional<InputArgument<T>> create(String key, Class<T> clazz) {
-        if(!registry.containsKey(clazz)) {
-            return Optional.empty();
+    public <T> InputArgument<T> create(String key, Class<T> clazz) {
+        if(!supports(clazz)) {
+            return null;
         }
-        return Optional.of((InputArgument<T>) registry.get(clazz).create(key));
+        return (InputArgument<T>) registry.get(clazz).create(key);
     }
 
     public boolean supports(Class<?> clazz) {

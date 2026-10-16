@@ -15,8 +15,8 @@ public record CommandMethod(Object instance, Method method) {
         return new CommandSyntax(syntax);
     }
 
-    public Set<Parameter> getSenderAnnotatedParameters() {
-        HashSet<Parameter> parameters = new HashSet<>();
+    public List<Parameter> getSenderAnnotatedParameters() {
+        List<Parameter> parameters = new ArrayList<>();
         for(Parameter p : method.getParameters()) {
             if(p.isAnnotationPresent(Sender.class))
                 parameters.add(p);

@@ -1,14 +1,9 @@
 package com.github.DasJava005.cmdApi.testplugin;
 
-import com.github.DasJava005.cmdApi.Command;
 import com.github.DasJava005.cmdApi.CommandRegistry;
-import com.github.DasJava005.cmdApi.reflection.CommandSyntax;
 import com.github.DasJava005.cmdApi.reflection.InputArgumentRegistry;
 import com.github.DasJava005.cmdApi.reflection.ReflectiveCommandBuilder;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.Iterator;
-import java.util.Set;
 
 public final class TestPlugin extends JavaPlugin {
 
@@ -23,16 +18,13 @@ public final class TestPlugin extends JavaPlugin {
 
         CommandRegistry registry = new CommandRegistry(this);
 
-        TestAnnotationCommand command = new TestAnnotationCommand();
+        InputArgumentRegistry inputArgumentRegistry = InputArgumentRegistry.defaultRegistry();
 
-        final InputArgumentRegistry inputArgumentRegistry = new InputArgumentRegistry();
-        inputArgumentRegistry.registerDefaults();
+        var commandBuilder = new ReflectiveCommandBuilder(inputArgumentRegistry);
 
-        var commandBuilder = ReflectiveCommandBuilder.defaultBuilder();
+        TestTablistCommand landCommand = new TestTablistCommand();
 
-        Set<Command> commandSet = commandBuilder.buildCommands(command);
-
-        registry.registerCommands(commandSet.toArray(new Command[0]));
+        registry.registerCommands(commandBuilder.buildCommands(landCommand));
     }
 
     @Override
