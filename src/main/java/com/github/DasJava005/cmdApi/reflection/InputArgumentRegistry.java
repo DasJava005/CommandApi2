@@ -7,7 +7,6 @@ import com.github.DasJava005.cmdApi.Parser;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 public final class InputArgumentRegistry {
 

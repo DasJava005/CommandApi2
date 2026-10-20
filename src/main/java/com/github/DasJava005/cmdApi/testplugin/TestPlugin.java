@@ -4,6 +4,7 @@ import com.github.DasJava005.cmdApi.CommandRegistry;
 import com.github.DasJava005.cmdApi.reflection.InputArgumentRegistry;
 import com.github.DasJava005.cmdApi.reflection.ReflectiveCommandBuilder;
 import com.github.DasJava005.cmdApi.testplugin.commands.HelloBukkitCommand;
+import com.github.DasJava005.cmdApi.testplugin.commands.InputCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class TestPlugin extends JavaPlugin {
@@ -23,9 +24,11 @@ public final class TestPlugin extends JavaPlugin {
 
         var commandBuilder = new ReflectiveCommandBuilder(inputArgumentRegistry);
 
-        HelloBukkitCommand landCommand = new HelloBukkitCommand();
+        var landCommand = new HelloBukkitCommand();
+        var inputcommand = new InputCommand();
 
         registry.registerCommands(commandBuilder.buildCommands(landCommand));
+        registry.registerCommands(commandBuilder.buildCommands(inputcommand));
     }
 
     @Override
