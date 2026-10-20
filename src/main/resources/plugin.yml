@@ -1,0 +1,4 @@
+name: TestPluginForCommandApi
+version: 1.0
+main: com.github.DasJava005.cmdApi.testplugin.TestPlugin
+api-version: 1.21
