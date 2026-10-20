@@ -97,6 +97,17 @@ public class CommandMethodValidator {
             }
             // TODO check that greedy is only used with String type
         }
+
+        List<Parameter> greedyParameters = commandMethod.getGreedyAnnotatedParameters();
+        if(greedyParameters.size() > 1) {
+            throw new CommandValidationException(commandMethod, "Only one parameter may be annotated with @Greedy");
+        }
+
+        if(!greedyParameters.isEmpty()) {
+            if(greedyParameters.getFirst().getType() != String.class) {
+                throw new CommandValidationException(commandMethod, "Parameter annotated with @Greedy must be a String");
+            }
+        }
     }
 
     public static sealed interface ValidationResult permits Success, Fail {
