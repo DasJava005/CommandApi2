@@ -2,6 +2,7 @@ package com.github.DasJava005.cmdApi.reflection;
 
 import com.github.DasJava005.cmdApi.reflection.annotations.Arg;
 import com.github.DasJava005.cmdApi.reflection.annotations.Cmd;
+import com.github.DasJava005.cmdApi.reflection.annotations.Greedy;
 import com.github.DasJava005.cmdApi.reflection.annotations.Sender;
 
 import java.lang.reflect.Method;
@@ -30,6 +31,16 @@ public record CommandMethod(Object instance, Method method) {
             if(p.isAnnotationPresent(Arg.class)){
                 String parameterName = p.getAnnotation(Arg.class).value();
                 parameters.computeIfAbsent(parameterName, _ -> new ArrayList<>()).add(p);
+            }
+        }
+        return parameters;
+    }
+
+    public List<Parameter> getGreedyAnnotatedParameters() {
+        List<Parameter> parameters = new ArrayList<>();
+        for(Parameter p : method.getParameters()) {
+            if(p.isAnnotationPresent(Greedy.class)){
+                parameters.add(p);
             }
         }
         return parameters;

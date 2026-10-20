@@ -10,7 +10,7 @@ import java.lang.reflect.Parameter;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ReflectiveExecutor implements CommandExecutor {
+public final class ReflectiveExecutor implements CommandExecutor {
 
     private final CommandMethodValidator.ValidatedCommandMethod commandMethod;
 
