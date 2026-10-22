@@ -17,9 +17,7 @@ public final class CommandBuilder {
     private String description = "";
 
     private final List<Argument> arguments = new ArrayList<>();
-
     private Class<? extends CommandSender> sender = Player.class;
-
     private CommandExecutor executor = _ -> {};
 
     private CommandBuilder(String label) {
