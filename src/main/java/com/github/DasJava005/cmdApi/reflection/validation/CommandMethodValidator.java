@@ -39,7 +39,7 @@ public class CommandMethodValidator {
 
     public void validateAnnotations(CommandMethod commandMethod) {
         for(Parameter p : commandMethod.parameters()){
-
+            //TODO
         }
     }
 
