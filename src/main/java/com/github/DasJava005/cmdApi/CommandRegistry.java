@@ -22,12 +22,12 @@ public final class CommandRegistry {
     }
 
     public void registerCommand(Command command) {
-        if(!commands.containsKey(command.commandInfo().label())){
-            registerAsBukkitCommand(command.commandInfo());
+        if(!commands.containsKey(command.groupInfo().label())){
+            registerAsBukkitCommand(command.groupInfo());
         }
 
-        HashSet<String> keys = new HashSet<>(command.commandInfo().aliases());
-        keys.add(command.commandInfo().label());
+        HashSet<String> keys = new HashSet<>(command.groupInfo().aliases());
+        keys.add(command.groupInfo().label());
 
         for(String key : keys){
             commands.computeIfAbsent(key, _ -> new ArrayList<>()).add(command);
@@ -54,7 +54,7 @@ public final class CommandRegistry {
         return commands.getOrDefault(name, List.of());
     }
 
-    private void registerAsBukkitCommand(CommandInfo info) {
+    private void registerAsBukkitCommand(GroupInfo info) {
         try {
             final CommandMap commandMap =  getBukkitCommandMap();
             final org.bukkit.command.Command bukkitCommand = createBukkitCommand(info);
@@ -73,7 +73,7 @@ public final class CommandRegistry {
         return (CommandMap) bukkitCommandMap.get(plugin.getServer());
     }
 
-    private org.bukkit.command.Command createBukkitCommand(CommandInfo info) {
+    private org.bukkit.command.Command createBukkitCommand(GroupInfo info) {
         org.bukkit.command.Command command = new org.bukkit.command.Command(info.label()) {
             @Override
             public boolean execute(@NonNull CommandSender commandSender, @NonNull String commandName, String @NonNull [] tokens) {
@@ -88,7 +88,6 @@ public final class CommandRegistry {
         };
 
         command.setAliases(info.aliases());
-        command.setPermission(info.permission());
         command.setDescription(info.description());
 
         return command;

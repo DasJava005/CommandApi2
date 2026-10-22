@@ -3,14 +3,16 @@ package com.github.DasJava005.cmdApi.reflection;
 import com.github.DasJava005.cmdApi.Command;
 import com.github.DasJava005.cmdApi.CommandArguments;
 import com.github.DasJava005.cmdApi.CommandExecutor;
-import com.github.DasJava005.cmdApi.CommandInfo;
+import com.github.DasJava005.cmdApi.GroupInfo;
 import com.github.DasJava005.cmdApi.input.Argument;
+import com.github.DasJava005.cmdApi.input.GreedyArgument;
+import com.github.DasJava005.cmdApi.input.InputArgument;
 import com.github.DasJava005.cmdApi.input.LiteralArgument;
 import com.github.DasJava005.cmdApi.reflection.annotations.Cmd;
 import com.github.DasJava005.cmdApi.reflection.annotations.CommandGroup;
+import com.github.DasJava005.cmdApi.reflection.annotations.Greedy;
 import com.github.DasJava005.cmdApi.reflection.validation.CommandMethodValidator;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.*;
@@ -66,17 +68,21 @@ public final class ReflectiveCommandBuilder {
                 final String key = token.getToken();
                 Parameter p = parameters.get(key);
 
-                var inputArgument = inputArgumentRegistry.create(key, p.getType());
-                arguments.add(inputArgument);
+                if(p.isAnnotationPresent(Greedy.class)) {
+                    arguments.add(new GreedyArgument(key));
+                } else {
+                    InputArgument<?> inputArgument = inputArgumentRegistry.create(key, p.getType());
+                    arguments.add(inputArgument);
+                }
             }
         }
 
-        CommandInfo commandInfo = new CommandInfo(commandName, List.of(), "", "");
+        GroupInfo groupInfo = new GroupInfo(commandName, List.of(), "");
         CommandArguments commandArguments = new CommandArguments(arguments);
         Class<?> commandSender = commandMethod.getSenderParameter().getType();
         CommandExecutor commandExecutor = new ReflectiveExecutor(commandMethod);
 
-        return new Command(commandInfo, commandArguments, commandSender, commandExecutor);
+        return new Command(groupInfo, commandArguments, commandSender, commandExecutor);
     }
 
 }
