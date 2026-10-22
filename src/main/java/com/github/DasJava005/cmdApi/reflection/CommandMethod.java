@@ -8,6 +8,7 @@ import com.github.DasJava005.cmdApi.reflection.annotations.Sender;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public record CommandMethod(Object instance, Method method) {
 
@@ -16,34 +17,22 @@ public record CommandMethod(Object instance, Method method) {
         return new CommandSyntax(syntax);
     }
 
-    public List<Parameter> getSenderAnnotatedParameters() {
-        List<Parameter> parameters = new ArrayList<>();
-        for(Parameter p : method.getParameters()) {
-            if(p.isAnnotationPresent(Sender.class))
-                parameters.add(p);
-        }
-        return parameters;
+    public List<Parameter> parameters() {
+        return Arrays.stream(method.getParameters()).toList();
     }
 
-    public HashMap<String, List<Parameter>> getArgAnnotatedParameters() {
-        HashMap<String, List<Parameter>> parameters = new HashMap<>();
-        for(Parameter p : method.getParameters()) {
-            if(p.isAnnotationPresent(Arg.class)){
-                String parameterName = p.getAnnotation(Arg.class).value();
-                parameters.computeIfAbsent(parameterName, _ -> new ArrayList<>()).add(p);
-            }
-        }
-        return parameters;
+    public List<Parameter> getSenderAnnotatedParameters() {
+        return parameters().stream().filter(p -> p.isAnnotationPresent(Sender.class)).toList();
+    }
+
+    public Map<String, List<Parameter>> getArgAnnotatedParameters() {
+        return Arrays.stream(method.getParameters())
+                .filter(p -> p.isAnnotationPresent(Arg.class))
+                .collect(Collectors.groupingBy(p -> p.getAnnotation(Arg.class).value()));
     }
 
     public List<Parameter> getGreedyAnnotatedParameters() {
-        List<Parameter> parameters = new ArrayList<>();
-        for(Parameter p : method.getParameters()) {
-            if(p.isAnnotationPresent(Greedy.class)){
-                parameters.add(p);
-            }
-        }
-        return parameters;
+        return parameters().stream().filter(p -> p.isAnnotationPresent(Greedy.class)).toList();
     }
 
 }

@@ -37,6 +37,12 @@ public class CommandMethodValidator {
         return ValidationResult.success(result);
     }
 
+    public void validateAnnotations(CommandMethod commandMethod) {
+        for(Parameter p : commandMethod.parameters()){
+
+        }
+    }
+
     public void validateSender(CommandMethod commandMethod) throws CommandValidationException {
         List<Parameter> senderAnnotatedParams = commandMethod.getSenderAnnotatedParameters();
 
@@ -55,7 +61,7 @@ public class CommandMethodValidator {
 
     public void validateArguments(CommandMethod commandMethod) throws CommandValidationException {
         CommandSyntax syntax = commandMethod.getCommandSyntax();
-        HashMap<String, List<Parameter>> argAnnotatedParams = commandMethod.getArgAnnotatedParameters();
+        Map<String, List<Parameter>> argAnnotatedParams = commandMethod.getArgAnnotatedParameters();
 
         int definedArguments = syntax.getArgumentTokens().size();
         int providedArguments = argAnnotatedParams.size();
@@ -95,7 +101,6 @@ public class CommandMethodValidator {
             if(!registry.supports(param.getType())) {
                 throw new CommandValidationException(commandMethod, "Registry does not provide support for type: " + param.getType());
             }
-            // TODO check that greedy is only used with String type
         }
 
         List<Parameter> greedyParameters = commandMethod.getGreedyAnnotatedParameters();
