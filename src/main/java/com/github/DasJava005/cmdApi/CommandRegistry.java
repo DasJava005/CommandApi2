@@ -56,7 +56,7 @@ public final class CommandRegistry {
 
     private void registerAsBukkitCommand(GroupInfo info) {
         try {
-            final CommandMap commandMap =  getBukkitCommandMap();
+            final CommandMap commandMap = getBukkitCommandMap();
             final org.bukkit.command.Command bukkitCommand = createBukkitCommand(info);
             commandMap.register(plugin.getName(), bukkitCommand);
         }catch (ReflectiveOperationException e) {
