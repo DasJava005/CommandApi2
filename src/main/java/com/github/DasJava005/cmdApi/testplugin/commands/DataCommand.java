@@ -17,4 +17,9 @@ public class DataCommand {
         sender.sendMessage(Component.text("input was: " + age));
     }
 
+    @Cmd("favchar #char")
+    public void favChar(@Sender Player sender, @Arg("char") char c) {
+        sender.sendMessage(Component.text("input was: " + c));
+    }
+
 }
