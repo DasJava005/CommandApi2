@@ -4,6 +4,7 @@ import com.github.DasJava005.cmdApi.input.InputArgument;
 import com.github.DasJava005.cmdApi.input.InputArgumentFactory;
 import com.github.DasJava005.cmdApi.input.InputArguments;
 import com.github.DasJava005.cmdApi.Parser;
+import com.github.DasJava005.cmdApi.utils.Primitives;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,20 +30,20 @@ public final class InputArgumentRegistry {
 
     public void registerDefaults() {
         for(var defArg : InputArguments.values()){
-            registry.put(defArg.type(), defArg.factory());
+            registry.put(Primitives.wrapPrimitive(defArg.type()), defArg.factory());
         }
     }
 
     @SuppressWarnings("unchecked")
     public <T> InputArgument<T> create(String key, Class<T> clazz) {
-        if(!supports(clazz)) {
+        if(!supports(Primitives.wrapPrimitive(clazz))) {
             return null;
         }
-        return (InputArgument<T>) registry.get(clazz).create(key);
+        return (InputArgument<T>) registry.get(Primitives.wrapPrimitive(clazz)).create(key);
     }
 
     public boolean supports(Class<?> clazz) {
-        return registry.containsKey(clazz);
+        return registry.containsKey(Primitives.wrapPrimitive(clazz));
     }
 
 }
