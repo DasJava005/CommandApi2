@@ -4,6 +4,7 @@ import com.github.DasJava005.cmdApi.CommandRegistry;
 import com.github.DasJava005.cmdApi.reflection.InputArgumentRegistry;
 import com.github.DasJava005.cmdApi.reflection.ReflectiveCommandBuilder;
 import com.github.DasJava005.cmdApi.testplugin.commands.ChatCommand;
+import com.github.DasJava005.cmdApi.testplugin.commands.GetCommand;
 import com.github.DasJava005.cmdApi.testplugin.commands.HelloBukkitCommand;
 import com.github.DasJava005.cmdApi.testplugin.commands.InputCommand;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -31,7 +32,7 @@ public final class TestPlugin extends JavaPlugin {
         registry.registerCommands(commandBuilder.buildCommands(landCommand));
         registry.registerCommands(commandBuilder.buildCommands(inputcommand));
         registry.registerCommands(commandBuilder.buildCommands(new ChatCommand()));
-        registry.registerCommands(commandBuilder.buildCommands(new InputCommand()));
+        registry.registerCommands(commandBuilder.buildCommands(new GetCommand()));
     }
 
     @Override
