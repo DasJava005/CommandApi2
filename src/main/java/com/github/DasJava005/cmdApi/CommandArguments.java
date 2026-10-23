@@ -74,4 +74,30 @@ public final class CommandArguments {
         return argumentsByToken.size();
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof CommandArguments other)) return false;
+        if (definitions.size() != other.definitions.size()) return false;
+
+        for (int i = 0; i < definitions.size(); i++) {
+            if (definitions.get(i) != other.definitions.get(i)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 1;
+
+        for (Argument argument : definitions) {
+            result = 31 * result + argument.hashCode();
+        }
+
+        return result;
+    }
+
 }
