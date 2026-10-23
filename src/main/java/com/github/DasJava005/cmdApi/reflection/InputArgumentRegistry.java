@@ -21,15 +21,15 @@ public final class InputArgumentRegistry {
     private final Map<Class<?>, InputArgumentFactory<?>> registry = new HashMap<>();
 
     public <T> void register(Class<T> clazz, InputArgumentFactory<T> factory) {
-        registry.put(clazz, factory);
+        registry.put(Primitives.wrapPrimitive(clazz), factory);
     }
 
     public <T> void register(Class<T> clazz, Parser<T> parser) {
-        registry.put(clazz, (InputArgumentFactory<T>) key -> InputArgument.create(key, parser));
+        registry.put(Primitives.wrapPrimitive(clazz), (InputArgumentFactory<T>) key -> InputArgument.create(key, parser));
     }
 
     public void registerDefaults() {
-        for(var defArg : InputArguments.values()){
+        for(var defArg : InputArguments.values()) {
             registry.put(Primitives.wrapPrimitive(defArg.type()), defArg.factory());
         }
     }
