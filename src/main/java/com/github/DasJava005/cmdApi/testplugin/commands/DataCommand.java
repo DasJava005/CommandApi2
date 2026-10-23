@@ -9,7 +9,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-@CommandGroup("data")
+@CommandGroup("get")
 public class DataCommand {
 
     @Cmd("age #age")

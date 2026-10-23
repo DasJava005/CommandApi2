@@ -31,6 +31,7 @@ public final class TestPlugin extends JavaPlugin {
         registry.registerCommands(commandBuilder.buildCommands(landCommand));
         registry.registerCommands(commandBuilder.buildCommands(inputcommand));
         registry.registerCommands(commandBuilder.buildCommands(new ChatCommand()));
+        registry.registerCommands(commandBuilder.buildCommands(new InputCommand()));
     }
 
     @Override
