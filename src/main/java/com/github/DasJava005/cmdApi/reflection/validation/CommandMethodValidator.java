@@ -4,6 +4,8 @@ import com.github.DasJava005.cmdApi.reflection.CommandMethod;
 import com.github.DasJava005.cmdApi.reflection.CommandSyntax;
 import com.github.DasJava005.cmdApi.reflection.InputArgumentRegistry;
 
+import com.github.DasJava005.cmdApi.reflection.annotations.Arg;
+import com.github.DasJava005.cmdApi.reflection.annotations.Sender;
 import org.bukkit.command.CommandSender;
 
 import java.lang.reflect.Method;
@@ -16,10 +18,12 @@ public class CommandMethodValidator {
 
     public final ValidationResult validate(CommandMethod commandMethod, InputArgumentRegistry inputArgumentRegistry) {
         try {
+            validateAnnotations(commandMethod);
             validateSender(commandMethod);
             validateArguments(commandMethod);
             validateArgumentTypes(commandMethod, inputArgumentRegistry);
-        } catch(CommandValidationException exception){
+            validateGreedy(commandMethod);
+        } catch(CommandValidationException exception) {
             return ValidationResult.fail(exception);
         }
 
@@ -38,8 +42,10 @@ public class CommandMethodValidator {
     }
 
     public void validateAnnotations(CommandMethod commandMethod) {
-        for(Parameter p : commandMethod.parameters()){
-            //TODO
+        for (Parameter parameter : commandMethod.method().getParameters()) {
+            if (parameter.isAnnotationPresent(Sender.class) && parameter.isAnnotationPresent(Arg.class)) {
+                throw new CommandValidationException(commandMethod, "Can't have parameter annotated with both @Sender and @Arg");
+            }
         }
     }
 
@@ -102,7 +108,9 @@ public class CommandMethodValidator {
                 throw new CommandValidationException(commandMethod, "Registry does not provide support for type: " + param.getType());
             }
         }
+    }
 
+    private void validateGreedy(CommandMethod commandMethod) {
         List<Parameter> greedyParameters = commandMethod.getGreedyAnnotatedParameters();
         if(greedyParameters.size() > 1) {
             throw new CommandValidationException(commandMethod, "Only one parameter may be annotated with @Greedy");
@@ -155,7 +163,7 @@ public class CommandMethodValidator {
     public static final class ValidatedCommandMethod {
 
         private final Object instance;
-        private final Method commadMethod;
+        private final Method commandMethod;
         private final CommandSyntax commandSyntax;
         private final Parameter sender;
         private final Map<String, Parameter> parameters;
@@ -166,7 +174,7 @@ public class CommandMethodValidator {
                                        Parameter senderParameter,
                                        Map<String, Parameter> argParameters){
             this.instance = instance;
-            this.commadMethod = commandMethod;
+            this.commandMethod = commandMethod;
             this.commandSyntax = commandSyntax;
             this.sender = senderParameter;
             this.parameters = argParameters;
@@ -177,7 +185,7 @@ public class CommandMethodValidator {
         }
 
         public Method getExecutorMethod() {
-            return commadMethod;
+            return commandMethod;
         }
 
         public CommandSyntax getCommandSyntax() {
