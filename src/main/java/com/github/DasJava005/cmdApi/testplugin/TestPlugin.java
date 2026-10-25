@@ -1,13 +1,17 @@
 package com.github.DasJava005.cmdApi.testplugin;
 
-import com.github.DasJava005.cmdApi.CommandRegistry;
+import com.github.DasJava005.cmdApi.base.CommandBuilder;
+import com.github.DasJava005.cmdApi.base.CommandRegistry;
+import com.github.DasJava005.cmdApi.base.arguments.GreedyArgument;
+import com.github.DasJava005.cmdApi.base.arguments.InputArguments;
 import com.github.DasJava005.cmdApi.reflection.InputArgumentRegistry;
-import com.github.DasJava005.cmdApi.reflection.ReflectiveCommandBuilder;
 import com.github.DasJava005.cmdApi.testplugin.commands.ChatCommand;
 import com.github.DasJava005.cmdApi.testplugin.commands.GetCommand;
 import com.github.DasJava005.cmdApi.testplugin.commands.HelloBukkitCommand;
 import com.github.DasJava005.cmdApi.testplugin.commands.InputCommand;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.util.Vector;
 
 public final class TestPlugin extends JavaPlugin {
 
@@ -22,17 +26,27 @@ public final class TestPlugin extends JavaPlugin {
 
         CommandRegistry registry = new CommandRegistry(this);
 
-        InputArgumentRegistry inputArgumentRegistry = InputArgumentRegistry.defaultRegistry();
+        registry.registerCommand(CommandBuilder.of("test_a")
+                .argument(InputArguments.BOOLEAN.createArgument("bool"))
+                .argument(InputArguments.STRING.createArgument("string"))
+                .executor(ctx -> {
+                    Player p = ctx.getSender(Player.class);
+                    boolean bool = ctx.get("bool", Boolean.class);
+                    String str = ctx.get("string", String.class);
+                    p.sendMessage(bool +  " " + str);
+                })
+        );
 
-        var commandBuilder = new ReflectiveCommandBuilder(inputArgumentRegistry);
-
-        var landCommand = new HelloBukkitCommand();
-        var inputcommand = new InputCommand();
-
-        registry.registerCommands(commandBuilder.buildCommands(landCommand));
-        registry.registerCommands(commandBuilder.buildCommands(inputcommand));
-        registry.registerCommands(commandBuilder.buildCommands(new ChatCommand()));
-        registry.registerCommands(commandBuilder.buildCommands(new GetCommand()));
+        registry.registerCommand(CommandBuilder.of("test_b")
+                .argument(InputArguments.VECTOR.createArgument("vec"))
+                .argument(new GreedyArgument("greedy"))
+                .executor(ctx -> {
+                    Vector v = ctx.get("vec", Vector.class);
+                    String str =  ctx.get("greedy", String.class);
+                    IO.println("test_b:");
+                    IO.println(v.toString()+" "  + str);
+                })
+        );
     }
 
     @Override

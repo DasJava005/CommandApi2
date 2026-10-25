@@ -2,6 +2,8 @@ package com.github.DasJava005.cmdApi.base.arguments;
 
 import com.github.DasJava005.cmdApi.base.arguments.impl.BooleanArgument;
 import com.github.DasJava005.cmdApi.base.arguments.impl.StringArgument;
+import com.github.DasJava005.cmdApi.base.arguments.impl.bukkit.VectorArgument;
+import org.bukkit.util.Vector;
 
 /**
  * Provides default implementations for certain types.
@@ -9,7 +11,9 @@ import com.github.DasJava005.cmdApi.base.arguments.impl.StringArgument;
 public enum InputArguments {
 
     STRING(String.class, StringArgument::new),
-    BOOLEAN(Boolean.class, BooleanArgument::new);
+    BOOLEAN(Boolean.class, BooleanArgument::new),
+
+    VECTOR(Vector.class, VectorArgument::new);
 
     private final Class<?> type;
     private final InputArgumentFactory<?> factory;
