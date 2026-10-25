@@ -119,7 +119,7 @@ public final class CommandDispatcher {
 
         return MatchResult.success(command, ctxValues);
     }
-/*
+
     public List<String> tabComplete(CommandSender commandSender, String commandName, String[] tokens) {
         final List<Command> commands = commandProvider.getCommands(commandName);
 
@@ -129,12 +129,12 @@ public final class CommandDispatcher {
 
             final CommandArguments arguments = command.arguments();
 
-            Argument lastArgument = arguments.getAtToken(tokens.length - 1);
+            Argument lastArgument = arguments.getArgumentAtIndex(tokens.length - 1);
             if (lastArgument == null) continue;
 
             int lastInputLength = 0;
             for (int i = tokens.length - 1; i >= 0; i--) {
-                if (lastArgument == arguments.getAtToken(i)) { //the map contains the same object for both keys
+                if (lastArgument == arguments.getArgumentAtIndex(i)) { //the map contains the same object for both keys
                     lastInputLength++;
                 } else
                     break;
@@ -148,5 +148,5 @@ public final class CommandDispatcher {
 
         return List.of();
     }
-*/
+
 }

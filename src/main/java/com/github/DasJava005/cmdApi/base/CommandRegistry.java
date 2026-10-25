@@ -79,13 +79,13 @@ public final class CommandRegistry {
             public boolean execute(@NonNull CommandSender commandSender, @NonNull String commandName, String @NonNull [] tokens) {
                 return dispatcher.execute(commandSender, commandName, tokens);
             }
-    /*
+
             @NonNull
             @Override
             public List<String> tabComplete(@NonNull CommandSender sender, @NonNull String alias, String @NonNull [] args) {
                 return dispatcher.tabComplete(sender, alias, args);
             }
-     */
+
         };
 
         command.setAliases(info.aliases());
