@@ -1,10 +1,10 @@
 package com.github.DasJava005.cmdApi.reflection;
 
-import com.github.DasJava005.cmdApi.input.InputArgument;
-import com.github.DasJava005.cmdApi.input.InputArgumentFactory;
-import com.github.DasJava005.cmdApi.input.InputArguments;
-import com.github.DasJava005.cmdApi.Parser;
-import com.github.DasJava005.cmdApi.utils.Primitives;
+import com.github.DasJava005.cmdApi.base.arguments.InputArgument;
+import com.github.DasJava005.cmdApi.base.arguments.InputArgumentFactory;
+import com.github.DasJava005.cmdApi.base.arguments.InputArguments;
+import com.github.DasJava005.cmdApi.base.Parser;
+import com.github.DasJava005.cmdApi.reflection.utils.Primitives;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,10 +21,6 @@ public final class InputArgumentRegistry {
 
     public <T> void register(Class<T> clazz, InputArgumentFactory<T> factory) {
         registry.put(Primitives.wrapPrimitive(clazz), factory);
-    }
-
-    public <T> void register(Class<T> clazz, Parser<T> parser) {
-        registry.put(Primitives.wrapPrimitive(clazz), (InputArgumentFactory<T>) key -> InputArgument.create(key, parser));
     }
 
     public void registerDefaults() {

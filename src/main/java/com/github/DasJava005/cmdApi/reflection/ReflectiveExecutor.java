@@ -1,10 +1,11 @@
 package com.github.DasJava005.cmdApi.reflection;
 
-import com.github.DasJava005.cmdApi.CommandContext;
-import com.github.DasJava005.cmdApi.CommandExecutor;
+import com.github.DasJava005.cmdApi.base.CommandContext;
+import com.github.DasJava005.cmdApi.base.CommandExecutor;
 import com.github.DasJava005.cmdApi.reflection.annotations.Arg;
 import com.github.DasJava005.cmdApi.reflection.annotations.Sender;
 import com.github.DasJava005.cmdApi.reflection.validation.CommandMethodValidator;
+import com.github.DasJava005.cmdApi.reflection.utils.Primitives;
 
 import java.lang.reflect.Parameter;
 import java.util.LinkedList;
@@ -26,7 +27,7 @@ public final class ReflectiveExecutor implements CommandExecutor {
                 objectList.add(ctx.getSender(p.getType()));
             }
             if(p.isAnnotationPresent(Arg.class)){
-                objectList.add(ctx.get(p.getAnnotation(Arg.class).value(), p.getType()));
+                objectList.add(ctx.get(p.getAnnotation(Arg.class).value(), Primitives.wrapPrimitive(p.getType())));
             }
         }
         try {
