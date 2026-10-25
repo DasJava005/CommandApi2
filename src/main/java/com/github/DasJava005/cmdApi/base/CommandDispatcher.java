@@ -95,6 +95,7 @@ public final class CommandDispatcher {
                             } catch (ParseException e) {
                                 return MatchResult.parseException(e);
                             }
+                            i = tokens.length;
                         }
 
                         case TokenConsumer.TokenConsumerType.Remaining _ -> {
@@ -105,6 +106,7 @@ public final class CommandDispatcher {
                             } catch (ParseException e) {
                                 return MatchResult.parseException(e);
                             }
+                            i = tokens.length;
                         }
                     }
                 }

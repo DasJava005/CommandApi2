@@ -64,6 +64,10 @@ public class CommandArguments {
         return isTokenConsumeCountExact;
     }
 
+    public Argument getArgumentAtIndex(int index) {
+        return arguments.get(index);
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
