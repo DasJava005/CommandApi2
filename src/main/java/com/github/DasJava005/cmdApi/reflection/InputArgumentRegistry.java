@@ -23,10 +23,6 @@ public final class InputArgumentRegistry {
         registry.put(Primitives.wrapPrimitive(clazz), factory);
     }
 
-    public <T> void register(Class<T> clazz, Parser<T> parser) {
-        registry.put(Primitives.wrapPrimitive(clazz), (InputArgumentFactory<T>) key -> InputArgument.create(key, parser));
-    }
-
     public void registerDefaults() {
         for(var defArg : InputArguments.values()) {
             registry.put(Primitives.wrapPrimitive(defArg.type()), defArg.factory());

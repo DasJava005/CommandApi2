@@ -1,8 +1,10 @@
 package com.github.DasJava005.cmdApi.base.arguments;
 
-import com.github.DasJava005.cmdApi.base.Parser;
+public final class GreedyArgument extends InputArgument<String> {
 
-public record GreedyArgument(String key) implements Argument, Parser<String> {
+    public GreedyArgument(String key) {
+        super(key);
+    }
 
     @Override
     public String parse(String[] tokens) {
@@ -14,8 +16,8 @@ public record GreedyArgument(String key) implements Argument, Parser<String> {
     }
 
     @Override
-    public final int tokenConsumeCount() {
-        return -1;
+    public TokenConsumerType getConsumerType() {
+        return TokenConsumerType.remaining();
     }
 
 }

@@ -4,20 +4,11 @@ import org.bukkit.command.CommandSender;
 
 import java.util.List;
 
-public sealed interface Argument extends TokenConsumer permits GreedyArgument, InputArgument, LiteralArgument {
+public sealed interface Argument extends TokenConsumer permits InputArgument, LiteralArgument {
 
     @Override
-    default ConsumerType getConsumerType() {
-        return ConsumerType.exactly(1);
-    }
-
-    /**
-     * Returns the number of tokens consumed by this argument.
-     *
-     * @return the token count
-     */
-    default int tokenConsumeCount() {
-        return 1;
+    default TokenConsumerType getConsumerType() {
+        return TokenConsumerType.exactly(1);
     }
 
     /**

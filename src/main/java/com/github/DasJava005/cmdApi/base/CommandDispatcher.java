@@ -1,9 +1,6 @@
 package com.github.DasJava005.cmdApi.base;
 
-import com.github.DasJava005.cmdApi.base.arguments.Argument;
-import com.github.DasJava005.cmdApi.base.arguments.GreedyArgument;
-import com.github.DasJava005.cmdApi.base.arguments.InputArgument;
-import com.github.DasJava005.cmdApi.base.arguments.LiteralArgument;
+import com.github.DasJava005.cmdApi.base.arguments.*;
 import org.bukkit.command.CommandSender;
 import org.jspecify.annotations.NonNull;
 
@@ -18,7 +15,7 @@ public final class CommandDispatcher {
 
     public boolean execute(@NonNull CommandSender commandSender, @NonNull String commandName, String @NonNull [] tokens) {
         final List<Command> commands = commandProvider.getCommands(commandName).stream()
-                .sorted((c1, c2) -> Integer.compare(c2.arguments().tokenConsumeCount(), c1.arguments().tokenConsumeCount()))
+                .sorted((c1, c2) -> Integer.compare(c2.arguments().minRequiredTokens(), c1.arguments().minRequiredTokens()))
                 .toList();
 
         if(commands.isEmpty()) {
@@ -66,9 +63,8 @@ public final class CommandDispatcher {
         final Map<String, Object> ctxValues = new HashMap<>();
 
         int i = 0; // the i-th token
-        for(Argument arg : command.arguments().getDefinitions()) {
+        for(Argument arg : command.arguments().getArguments()) {
             switch (arg) {
-
                 case LiteralArgument literalArgument -> {
                     if (i >= tokens.length) return MatchResult.noMatch();
                     if (!literalArgument.literal().equalsIgnoreCase(tokens[i])) return MatchResult.noMatch();
@@ -76,40 +72,58 @@ public final class CommandDispatcher {
                 }
 
                 case InputArgument<?> inputArgument -> {
-                    if (tokens.length < i + inputArgument.tokenConsumeCount()) return MatchResult.noMatch();
-                    final String[] parseArguments = Arrays.copyOfRange(tokens, i, i + inputArgument.tokenConsumeCount());
+                    switch (inputArgument.getConsumerType()) {
+                        case TokenConsumer.TokenConsumerType.Exactly(int tokenConsumeCount) ->{
+                            if (tokens.length < i + tokenConsumeCount) return MatchResult.noMatch();
+                            final String[] parseArguments = Arrays.copyOfRange(tokens, i, i + tokenConsumeCount);
 
-                    try {
-                        Object obj = inputArgument.parse(parseArguments);
-                        ctxValues.put(inputArgument.key(), obj);
-                    } catch (ParseException e) {
-                        return MatchResult.parseException(e);
+                            try {
+                                Object obj = inputArgument.parse(parseArguments);
+                                ctxValues.put(inputArgument.key(), obj);
+                            } catch (ParseException e) {
+                                return MatchResult.parseException(e);
+                            }
+                            i += tokenConsumeCount;
+                        }
+
+                        case TokenConsumer.TokenConsumerType.AtLeast(int tokenConsumeCount) -> {
+                            if (tokens.length < i + tokenConsumeCount) return MatchResult.noMatch(); // did not provide enough args
+                            final String[] parseArguments = Arrays.copyOfRange(tokens, i, tokens.length);
+                            try {
+                                Object obj = inputArgument.parse(parseArguments);
+                                ctxValues.put(inputArgument.key(), obj);
+                            } catch (ParseException e) {
+                                return MatchResult.parseException(e);
+                            }
+                        }
+
+                        case TokenConsumer.TokenConsumerType.Remaining _ -> {
+                            final String[] parseArguments = Arrays.copyOfRange(tokens, i, tokens.length);
+                            try {
+                                Object obj = inputArgument.parse(parseArguments);
+                                ctxValues.put(inputArgument.key(), obj);
+                            } catch (ParseException e) {
+                                return MatchResult.parseException(e);
+                            }
+                        }
                     }
-                    i += inputArgument.tokenConsumeCount();
                 }
-
-                case GreedyArgument greedyArgument -> {
-                    final String[] parseArguments = Arrays.copyOfRange(tokens, i, tokens.length);
-                    String str = greedyArgument.parse(parseArguments);
-                    ctxValues.put(greedyArgument.key(), str);
-                }
-
             }
         }
 
-        if (i != tokens.length && !command.arguments().hasGreedyArgument()) { // user provided too many tokens
+        if (i != tokens.length && !command.arguments().isTokenConsumeCountExactly()) { // user provided too many tokens
             return MatchResult.noMatch();
         }
 
         return MatchResult.success(command, ctxValues);
     }
-
+/*
     public List<String> tabComplete(CommandSender commandSender, String commandName, String[] tokens) {
         final List<Command> commands = commandProvider.getCommands(commandName);
 
         for (final Command command : commands) {
             if (!command.sender().isInstance(commandSender)) continue;
-            if(tokens.length > command.arguments().tokenConsumeCount()) continue;
+            if(tokens.length > command.arguments().minRequiredTokens()) continue;
 
             final CommandArguments arguments = command.arguments();
 
@@ -132,5 +146,5 @@ public final class CommandDispatcher {
 
         return List.of();
     }
-
+*/
 }
