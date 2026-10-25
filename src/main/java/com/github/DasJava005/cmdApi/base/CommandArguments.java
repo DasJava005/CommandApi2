@@ -19,8 +19,7 @@ public class CommandArguments {
         for (int i = 0; i < this.arguments.size(); i++) {
             Argument argument = this.arguments.get(i);
 
-            if (!(argument.getConsumerType() instanceof TokenConsumer.TokenConsumerType.Exactly)
-                    && i != this.arguments.size() - 1) {
+            if (!(argument.getConsumerType() instanceof TokenConsumer.TokenConsumerType.Exactly) && i != this.arguments.size() - 1) {
                 throw new IllegalArgumentException("Argument with non-exact token consumer type must be the last object in the list.");
             }
         }
@@ -65,7 +64,18 @@ public class CommandArguments {
     }
 
     public Argument getArgumentAtIndex(int index) {
-        return arguments.get(index);
+        int i = 0;
+        for(Argument argument : arguments) {
+            if(argument.getConsumerType() instanceof TokenConsumer.TokenConsumerType.Exactly(int tokens)){
+                if(index >= i && index < i + tokens){
+                    return argument;
+                }
+                i += tokens;
+            } else {
+                return arguments.getLast();
+            }
+        }
+        return null;
     }
 
     @Override
