@@ -1,14 +1,13 @@
 package com.github.DasJava005.cmdApi.reflection;
 
-import com.github.DasJava005.cmdApi.input.InputArgument;
-import com.github.DasJava005.cmdApi.input.InputArgumentFactory;
-import com.github.DasJava005.cmdApi.input.InputArguments;
-import com.github.DasJava005.cmdApi.Parser;
-import com.github.DasJava005.cmdApi.utils.Primitives;
+import com.github.DasJava005.cmdApi.base.arguments.InputArgument;
+import com.github.DasJava005.cmdApi.base.arguments.InputArgumentFactory;
+import com.github.DasJava005.cmdApi.base.arguments.InputArguments;
+import com.github.DasJava005.cmdApi.base.Parser;
+import com.github.DasJava005.cmdApi.reflection.utils.Primitives;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 public final class InputArgumentRegistry {
 
