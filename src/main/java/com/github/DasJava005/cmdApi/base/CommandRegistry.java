@@ -15,10 +15,12 @@ public final class CommandRegistry {
     private final Map<String, List<Command>> commands = new HashMap<>();
 
     private final CommandDispatcher dispatcher;
+    private final CommandTabCompleter tabCompleter;
 
     public CommandRegistry(JavaPlugin plugin) {
         this.plugin = plugin;
         this.dispatcher = new CommandDispatcher(this::getCommands);
+        this.tabCompleter = new CommandTabCompleter(this::getCommands);
     }
 
     public void registerCommand(Command command) {
@@ -83,7 +85,7 @@ public final class CommandRegistry {
             @NonNull
             @Override
             public List<String> tabComplete(@NonNull CommandSender sender, @NonNull String alias, String @NonNull [] args) {
-                return dispatcher.tabComplete(sender, alias, args);
+                return tabCompleter.complete(sender, alias, args);
             }
 
         };

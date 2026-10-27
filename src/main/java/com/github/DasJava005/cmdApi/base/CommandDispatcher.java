@@ -120,31 +120,4 @@ public final class CommandDispatcher {
         return MatchResult.success(command, ctxValues);
     }
 
-    public List<String> tabComplete(CommandSender commandSender, String commandName, String[] tokens) {
-        final List<Command> commands = commandProvider.getCommands(commandName);
-
-        for (final Command command : commands) {
-            if (!command.sender().isInstance(commandSender)) continue;
-            if(tokens.length > command.arguments().minRequiredTokens()) continue;
-
-            final CommandArguments arguments = command.arguments();
-
-            Argument lastArgument = arguments.getArgumentAtIndex(tokens.length - 1);
-            if (lastArgument == null) continue;
-
-            int lastInputLength = 0;
-            for (int i = tokens.length - 1; i >= 0; i--) {
-                if (arguments.getArgumentAtIndex(i) != lastArgument) break;
-                lastInputLength++;
-            }
-
-            return lastArgument.suggestions(commandSender, Arrays.copyOfRange(
-                    tokens,
-                    tokens.length - lastInputLength,
-                    tokens.length));
-        }
-
-        return List.of();
-    }
-
 }
