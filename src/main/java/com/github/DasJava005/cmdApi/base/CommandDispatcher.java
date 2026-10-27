@@ -23,7 +23,7 @@ public final class CommandDispatcher {
             return false;
         }
 
-        MatchResult matchResult = MatchResult.noMatch(); //this is also the likeliest command the user tried to execute
+        MatchResult matchResult = MatchResult.noMatch();
         for(Command command : commands) {
             if(!matchSender(command,  commandSender)) {
                 continue;
@@ -113,7 +113,7 @@ public final class CommandDispatcher {
             }
         }
 
-        if (i != tokens.length && !command.arguments().isTokenConsumeCountExactly()) { // user provided too many tokens
+        if (i != tokens.length && !command.arguments().isTokenConsumeCountExactly()) { // user provided too many arguments
             return MatchResult.noMatch();
         }
 
@@ -134,10 +134,8 @@ public final class CommandDispatcher {
 
             int lastInputLength = 0;
             for (int i = tokens.length - 1; i >= 0; i--) {
-                if (lastArgument == arguments.getArgumentAtIndex(i)) { //the map contains the same object for both keys
-                    lastInputLength++;
-                } else
-                    break;
+                if (arguments.getArgumentAtIndex(i) != lastArgument) break;
+                lastInputLength++;
             }
 
             return lastArgument.suggestions(commandSender, Arrays.copyOfRange(
