@@ -78,6 +78,7 @@ public final class CommandBuilder {
 
         List<String> aliases = List.of(commandMethod.instance().getClass().getAnnotation(CommandGroup.class).aliases());
         String description = commandMethod.instance().getClass().getAnnotation(CommandGroup.class).description();
+        String permission = commandMethod.getExecutorMethod().getAnnotation(Cmd.class).permission();
 
         GroupInfo groupInfo = new GroupInfo(commandName, aliases, description);
 
@@ -85,7 +86,7 @@ public final class CommandBuilder {
         Class<?> commandSender = commandMethod.getSenderParameter().getType();
         CommandExecutor commandExecutor = new ReflectiveExecutor(commandMethod);
 
-        return new Command(groupInfo, commandArguments, commandSender, commandExecutor);
+        return new Command(groupInfo, commandArguments, commandSender, permission, commandExecutor);
     }
 
 }
