@@ -1,4 +1,4 @@
-import com.github.DasJava005.cmdApi.base.CommandArguments;
+import com.github.DasJava005.cmdApi.base.arguments.CommandArguments;
 import com.github.DasJava005.cmdApi.base.arguments.Argument;
 import com.github.DasJava005.cmdApi.base.arguments.GreedyArgument;
 import com.github.DasJava005.cmdApi.base.arguments.LiteralArgument;

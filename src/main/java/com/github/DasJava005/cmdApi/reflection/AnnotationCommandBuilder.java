@@ -1,7 +1,7 @@
 package com.github.DasJava005.cmdApi.reflection;
 
 import com.github.DasJava005.cmdApi.base.Command;
-import com.github.DasJava005.cmdApi.base.CommandArguments;
+import com.github.DasJava005.cmdApi.base.arguments.CommandArguments;
 import com.github.DasJava005.cmdApi.base.CommandExecutor;
 import com.github.DasJava005.cmdApi.base.GroupInfo;
 import com.github.DasJava005.cmdApi.base.arguments.Argument;

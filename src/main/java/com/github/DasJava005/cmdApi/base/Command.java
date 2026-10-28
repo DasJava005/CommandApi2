@@ -1,5 +1,6 @@
 package com.github.DasJava005.cmdApi.base;
 
+import com.github.DasJava005.cmdApi.base.arguments.CommandArguments;
 import org.bukkit.entity.Player;
 
 import java.util.List;

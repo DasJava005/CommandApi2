@@ -1,4 +1,4 @@
-package com.github.DasJava005.cmdApi.base;
+package com.github.DasJava005.cmdApi.base.parser;
 
 public class ParseException extends RuntimeException {
 

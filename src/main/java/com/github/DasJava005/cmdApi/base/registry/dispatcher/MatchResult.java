@@ -1,4 +1,6 @@
-package com.github.DasJava005.cmdApi.base;
+package com.github.DasJava005.cmdApi.base.registry.dispatcher;
+
+import com.github.DasJava005.cmdApi.base.parser.ParseException;
 
 import java.util.Map;
 

@@ -1,6 +1,10 @@
-package com.github.DasJava005.cmdApi.base;
+package com.github.DasJava005.cmdApi.base.builder;
 
+import com.github.DasJava005.cmdApi.base.Command;
+import com.github.DasJava005.cmdApi.base.CommandExecutor;
+import com.github.DasJava005.cmdApi.base.GroupInfo;
 import com.github.DasJava005.cmdApi.base.arguments.Argument;
+import com.github.DasJava005.cmdApi.base.arguments.CommandArguments;
 import com.github.DasJava005.cmdApi.base.arguments.LiteralArgument;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;

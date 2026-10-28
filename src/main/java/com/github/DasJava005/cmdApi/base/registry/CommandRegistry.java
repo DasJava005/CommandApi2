@@ -1,5 +1,8 @@
-package com.github.DasJava005.cmdApi.base;
+package com.github.DasJava005.cmdApi.base.registry;
 
+import com.github.DasJava005.cmdApi.base.*;
+import com.github.DasJava005.cmdApi.base.builder.CommandBuilder;
+import com.github.DasJava005.cmdApi.base.registry.dispatcher.CommandDispatcher;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.CommandSender;

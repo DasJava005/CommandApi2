@@ -1,7 +1,7 @@
 import com.github.DasJava005.cmdApi.base.Command;
-import com.github.DasJava005.cmdApi.base.CommandBuilder;
-import com.github.DasJava005.cmdApi.base.CommandDispatcher;
-import com.github.DasJava005.cmdApi.base.MatchResult;
+import com.github.DasJava005.cmdApi.base.builder.CommandBuilder;
+import com.github.DasJava005.cmdApi.base.registry.dispatcher.CommandDispatcher;
+import com.github.DasJava005.cmdApi.base.registry.dispatcher.MatchResult;
 import com.github.DasJava005.cmdApi.base.arguments.InputArguments;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
