@@ -5,10 +5,7 @@ import com.github.DasJava005.cmdApi.base.CommandRegistry;
 import com.github.DasJava005.cmdApi.base.arguments.GreedyArgument;
 import com.github.DasJava005.cmdApi.base.arguments.InputArguments;
 import com.github.DasJava005.cmdApi.reflection.InputArgumentRegistry;
-import com.github.DasJava005.cmdApi.testplugin.commands.ChatCommand;
-import com.github.DasJava005.cmdApi.testplugin.commands.GetCommand;
-import com.github.DasJava005.cmdApi.testplugin.commands.HelloBukkitCommand;
-import com.github.DasJava005.cmdApi.testplugin.commands.InputCommand;
+import com.github.DasJava005.cmdApi.testplugin.commands.*;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
@@ -47,6 +44,11 @@ public final class TestPlugin extends JavaPlugin {
                     IO.println(v.toString()+" "  + str);
                 })
         );
+
+        InputArgumentRegistry inputArgumentRegistry = new InputArgumentRegistry();
+        com.github.DasJava005.cmdApi.reflection.CommandBuilder commandBuilder = new com.github.DasJava005.cmdApi.reflection.CommandBuilder(inputArgumentRegistry);
+
+        registry.registerCommands(commandBuilder.buildCommands(new BalCommand()));
     }
 
     @Override

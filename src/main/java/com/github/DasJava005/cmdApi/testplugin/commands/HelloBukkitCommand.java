@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 public class HelloBukkitCommand {
 
     @Cmd("bukkit")
-    public void nickCommand(@Sender Player p){
+    public void hello(@Sender Player p){
         p.sendMessage("Hello Bukkit!");
     }
 
