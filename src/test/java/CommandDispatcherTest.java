@@ -40,9 +40,9 @@ public class CommandDispatcherTest {
     public static Stream<Arguments> matchCases() {
         return Stream.of(
                 Arguments.of("success", new String[]{"give", "playerToReceiveMoney", "10"}, MatchResult.Success.class),
-                Arguments.of("missing argument", new String[]{"give", "playerToReceiveMoney"}, MatchResult.NoMatch.class),
+                Arguments.of("missing argument", new String[]{"give", "playerToReceiveMoney"}, MatchResult.NotEnoughArguments.class),
                 Arguments.of("no integer", new String[]{"give", "playerToReceiveMoney", "abc"}, MatchResult.ParseFailure.class),
-                Arguments.of("missing sub command", new String[]{"delete", "playerToReceiveMoney", "10"}, MatchResult.NoMatch.class)
+                Arguments.of("missing sub command", new String[]{"delete", "playerToReceiveMoney", "10"}, MatchResult.LiteralMismatch.class)
         );
     }
 
