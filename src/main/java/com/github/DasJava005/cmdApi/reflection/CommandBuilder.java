@@ -58,7 +58,6 @@ public final class CommandBuilder {
 
         // build command arguments from syntax
         List<Argument> arguments = new ArrayList<>();
-
         for (CommandSyntax.CommandToken token : commandSyntax.tokens()) {
             if (token.isLiteral()) {
                 arguments.add(new LiteralArgument(token.getToken()));
@@ -77,7 +76,11 @@ public final class CommandBuilder {
             }
         }
 
-        GroupInfo groupInfo = new GroupInfo(commandName, List.of(), "");
+        List<String> aliases = List.of(commandMethod.instance().getClass().getAnnotation(CommandGroup.class).aliases());
+        String description = commandMethod.instance().getClass().getAnnotation(CommandGroup.class).description();
+
+        GroupInfo groupInfo = new GroupInfo(commandName, aliases, description);
+
         CommandArguments commandArguments = new CommandArguments(arguments);
         Class<?> commandSender = commandMethod.getSenderParameter().getType();
         CommandExecutor commandExecutor = new ReflectiveExecutor(commandMethod);

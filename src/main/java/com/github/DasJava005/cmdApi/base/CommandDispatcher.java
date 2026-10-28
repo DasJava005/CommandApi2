@@ -8,6 +8,8 @@ import java.util.*;
 
 public final class CommandDispatcher {
 
+    //TODO clean up this class
+
     private final CommandProvider commandProvider;
     public CommandDispatcher(CommandProvider commandProvider) {
         this.commandProvider = commandProvider;
@@ -59,23 +61,23 @@ public final class CommandDispatcher {
         return command.sender().isInstance(sender);
     }
 
-    private MatchResult matchArguments(Command command, String[] tokens) {
+    private MatchResult matchArguments(Command command, String[] userProvidedArgs) {
         final Map<String, Object> ctxValues = new HashMap<>();
 
         int i = 0; // the i-th token
         for(Argument arg : command.arguments().getArguments()) {
             switch (arg) {
                 case LiteralArgument literalArgument -> {
-                    if (i >= tokens.length) return MatchResult.noMatch();
-                    if (!literalArgument.literal().equalsIgnoreCase(tokens[i])) return MatchResult.noMatch();
+                    if (i >= userProvidedArgs.length) return MatchResult.noMatch();
+                    if (!literalArgument.literal().equalsIgnoreCase(userProvidedArgs[i])) return MatchResult.noMatch();
                     i++;
                 }
 
                 case InputArgument<?> inputArgument -> {
                     switch (inputArgument.getConsumerType()) {
                         case TokenConsumer.TokenConsumerType.Exactly(int tokenConsumeCount) ->{
-                            if (tokens.length < i + tokenConsumeCount) return MatchResult.noMatch();
-                            final String[] parseArguments = Arrays.copyOfRange(tokens, i, i + tokenConsumeCount);
+                            if (userProvidedArgs.length < i + tokenConsumeCount) return MatchResult.noMatch();
+                            final String[] parseArguments = Arrays.copyOfRange(userProvidedArgs, i, i + tokenConsumeCount);
 
                             try {
                                 Object obj = inputArgument.parse(parseArguments);
@@ -87,33 +89,33 @@ public final class CommandDispatcher {
                         }
 
                         case TokenConsumer.TokenConsumerType.AtLeast(int tokenConsumeCount) -> {
-                            if (tokens.length < i + tokenConsumeCount) return MatchResult.noMatch(); // did not provide enough args
-                            final String[] parseArguments = Arrays.copyOfRange(tokens, i, tokens.length);
+                            if (userProvidedArgs.length < i + tokenConsumeCount) return MatchResult.noMatch(); // did not provide enough args
+                            final String[] parseArguments = Arrays.copyOfRange(userProvidedArgs, i, userProvidedArgs.length);
                             try {
                                 Object obj = inputArgument.parse(parseArguments);
                                 ctxValues.put(inputArgument.key(), obj);
                             } catch (ParseException e) {
                                 return MatchResult.parseException(e);
                             }
-                            i = tokens.length;
+                            i = userProvidedArgs.length;
                         }
 
                         case TokenConsumer.TokenConsumerType.Remaining _ -> {
-                            final String[] parseArguments = Arrays.copyOfRange(tokens, i, tokens.length);
+                            final String[] parseArguments = Arrays.copyOfRange(userProvidedArgs, i, userProvidedArgs.length);
                             try {
                                 Object obj = inputArgument.parse(parseArguments);
                                 ctxValues.put(inputArgument.key(), obj);
                             } catch (ParseException e) {
                                 return MatchResult.parseException(e);
                             }
-                            i = tokens.length;
+                            i = userProvidedArgs.length;
                         }
                     }
                 }
             }
         }
 
-        if (i != tokens.length && !command.arguments().isTokenConsumeCountExactly()) { // user provided too many arguments
+        if (i != userProvidedArgs.length && !command.arguments().isTokenConsumeCountExactly()) { // user provided too many arguments
             return MatchResult.noMatch();
         }
 
