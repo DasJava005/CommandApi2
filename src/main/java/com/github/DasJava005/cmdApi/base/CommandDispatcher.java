@@ -21,7 +21,7 @@ public final class CommandDispatcher {
                 .filter(command -> {
                     for(int i = 0; i < tokens.length; i++) {
                         if(command.arguments().getArgumentAtIndex(i) instanceof LiteralArgument(String literal)){
-                            if(tokens[i].equalsIgnoreCase(literal)) return false;
+                            if(!tokens[i].equalsIgnoreCase(literal)) return false;
                         }
                     }
                     return true;
@@ -34,13 +34,19 @@ public final class CommandDispatcher {
             return false;
         }
 
+        List<MatchResult> noMatches = new ArrayList<>();
         for(Command command : commands) {
             var match = match(command, commandSender, tokens);
+            IO.println("loop: " + match);
             if(match instanceof MatchResult.Success(Map<String, Object> ctxValues)) {
                 command.executor().execute(new CommandContext(commandSender, ctxValues));
                 return true;
+            }else{
+                noMatches.add(match);
             }
         }
+
+        IO.println(noMatches);
 
         // TODO: improved feedback
 
@@ -60,15 +66,25 @@ public final class CommandDispatcher {
         for(Argument arg : command.arguments().getArguments()) {
             switch (arg) {
                 case LiteralArgument literalArgument -> {
-                    if (i >= userProvidedArgs.length) return MatchResult.noMatch();
-                    if (!literalArgument.literal().equalsIgnoreCase(userProvidedArgs[i])) return MatchResult.noMatch();
+                    if (i >= userProvidedArgs.length){
+                        IO.println("NO match");
+                        return MatchResult.noMatch();
+                    }
+                    if (!literalArgument.literal().equalsIgnoreCase(userProvidedArgs[i])){
+                        IO.println("NO match literal: " + literalArgument.literal());
+                        IO.println("user provided: " + userProvidedArgs[i]);
+                        return MatchResult.noMatch();
+                    }
                     i++;
                 }
 
                 case InputArgument<?> inputArgument -> {
                     switch (inputArgument.getConsumerType()) {
                         case TokenConsumer.TokenConsumerType.Exactly(int tokenConsumeCount) -> {
-                            if (userProvidedArgs.length < i + tokenConsumeCount) return MatchResult.noMatch();
+                            if (userProvidedArgs.length < i + tokenConsumeCount){
+                                IO.println("NO match inputArgument");
+                                return MatchResult.noMatch();
+                            }
                             final String[] parseArguments = Arrays.copyOfRange(userProvidedArgs, i, i + tokenConsumeCount);
 
                             try {

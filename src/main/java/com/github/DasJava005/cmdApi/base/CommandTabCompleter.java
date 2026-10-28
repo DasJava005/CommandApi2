@@ -17,6 +17,8 @@ public final class CommandTabCompleter {
     public List<String> complete(CommandSender commandSender, String commandName, String[] tokens) {
         final List<Command> commands = commandProvider.getCommands(commandName);
 
+        IO.println(commands);
+
         for (final Command command : commands) {
             if (!command.sender().isInstance(commandSender)) continue;
             if(tokens.length > command.arguments().minRequiredTokens()) continue;

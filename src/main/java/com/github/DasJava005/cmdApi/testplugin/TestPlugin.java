@@ -45,7 +45,7 @@ public final class TestPlugin extends JavaPlugin {
                 })
         );
 
-        InputArgumentRegistry inputArgumentRegistry = new InputArgumentRegistry();
+        InputArgumentRegistry inputArgumentRegistry = InputArgumentRegistry.defaultRegistry();
         com.github.DasJava005.cmdApi.reflection.CommandBuilder commandBuilder = new com.github.DasJava005.cmdApi.reflection.CommandBuilder(inputArgumentRegistry);
 
         registry.registerCommands(commandBuilder.buildCommands(new BalCommand()));
