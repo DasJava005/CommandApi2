@@ -21,7 +21,7 @@ public final class CommandDispatcher {
                 .filter(command -> {
                     for(int i = 0; i < tokens.length; i++) {
                         if(command.arguments().getArgumentAtIndex(i) instanceof LiteralArgument(String literal)){
-                            if(tokens[i].equalsIgnoreCase(literal)) return false;
+                            if(!tokens[i].equalsIgnoreCase(literal)) return false;
                         }
                     }
                     return true;
