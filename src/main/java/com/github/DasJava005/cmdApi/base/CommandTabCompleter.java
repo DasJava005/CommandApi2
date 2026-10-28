@@ -3,8 +3,11 @@ package com.github.DasJava005.cmdApi.base;
 import com.github.DasJava005.cmdApi.base.arguments.Argument;
 import org.bukkit.command.CommandSender;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public final class CommandTabCompleter {
 
@@ -16,11 +19,11 @@ public final class CommandTabCompleter {
 
     public List<String> complete(CommandSender commandSender, String commandName, String[] tokens) {
         final List<Command> commands = commandProvider.getCommands(commandName);
+        final List<String> completions = new ArrayList<>();
 
         for (final Command command : commands) {
             if (!command.sender().isInstance(commandSender)) continue;
             if(tokens.length > command.arguments().minRequiredTokens()) continue;
-
             final CommandArguments arguments = command.arguments();
 
             Argument lastArgument = arguments.getArgumentAtIndex(tokens.length - 1);
@@ -32,13 +35,11 @@ public final class CommandTabCompleter {
                 lastInputLength++;
             }
 
-            return lastArgument.suggestions(commandSender, Arrays.copyOfRange(
-                    tokens,
-                    tokens.length - lastInputLength,
-                    tokens.length));
+            completions.addAll(lastArgument.suggestions(commandSender, Arrays.copyOfRange(tokens, tokens.length - lastInputLength, tokens.length)).stream()
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toSet()));
         }
-
-        return List.of();
+        return completions;
     }
 
 }
