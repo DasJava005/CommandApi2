@@ -8,8 +8,6 @@ import java.util.*;
 
 public final class CommandDispatcher {
 
-    //TODO clean up this class
-
     private final CommandProvider commandProvider;
     public CommandDispatcher(CommandProvider commandProvider) {
         this.commandProvider = commandProvider;
@@ -42,7 +40,7 @@ public final class CommandDispatcher {
             }
         }
 
-        // TODO: improve feedback
+        // TODO: improve feedback for user
 
         commandSender.sendMessage("[!] Could not find any commands for '" + commandName + "'");
 
@@ -59,16 +57,17 @@ public final class CommandDispatcher {
         int i = 0; // the i-th token
         for(Argument arg : command.arguments().getArguments()) {
             switch (arg) {
-                case LiteralArgument literalArgument -> {
-                    if (i >= userProvidedArgs.length) return MatchResult.noMatch();
-                    if (!literalArgument.literal().equalsIgnoreCase(userProvidedArgs[i])) return MatchResult.noMatch();
+                case LiteralArgument(String literal) -> {
+                    if (i >= userProvidedArgs.length) return MatchResult.notEnoughArguments(command.arguments().minRequiredTokens(), userProvidedArgs.length);
+                    if (!literal.equalsIgnoreCase(userProvidedArgs[i])) return MatchResult.literalMismatch(literal, userProvidedArgs[i]);
                     i++;
                 }
 
                 case InputArgument<?> inputArgument -> {
                     switch (inputArgument.getConsumerType()) {
                         case TokenConsumer.TokenConsumerType.Exactly(int tokenConsumeCount) -> {
-                            if (userProvidedArgs.length < i + tokenConsumeCount) return MatchResult.noMatch();
+                            if (userProvidedArgs.length < i + tokenConsumeCount)
+                                return MatchResult.notEnoughArguments(command.arguments().minRequiredTokens(), userProvidedArgs.length);
                             final String[] parseArguments = Arrays.copyOfRange(userProvidedArgs, i, i + tokenConsumeCount);
 
                             try {
@@ -81,7 +80,8 @@ public final class CommandDispatcher {
                         }
 
                         case TokenConsumer.TokenConsumerType.AtLeast(int tokenConsumeCount) -> {
-                            if (userProvidedArgs.length < i + tokenConsumeCount) return MatchResult.noMatch(); // did not provide enough args
+                            if (userProvidedArgs.length < i + tokenConsumeCount)
+                                return MatchResult.notEnoughArguments(command.arguments().minRequiredTokens(), userProvidedArgs.length);
                             final String[] parseArguments = Arrays.copyOfRange(userProvidedArgs, i, userProvidedArgs.length);
                             try {
                                 Object obj = inputArgument.parse(parseArguments);
