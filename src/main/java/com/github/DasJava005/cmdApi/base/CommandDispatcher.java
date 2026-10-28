@@ -8,8 +8,6 @@ import java.util.*;
 
 public final class CommandDispatcher {
 
-    //TODO clean up this class
-
     private final CommandProvider commandProvider;
     public CommandDispatcher(CommandProvider commandProvider) {
         this.commandProvider = commandProvider;
@@ -17,6 +15,15 @@ public final class CommandDispatcher {
 
     public boolean execute(@NonNull CommandSender commandSender, @NonNull String commandName, String @NonNull [] tokens) {
         final List<Command> commands = commandProvider.getCommands(commandName).stream()
+                // pre-filter commands that already match with all literals to provide better suggestions
+                .filter(command -> {
+                    for(int i = 0; i < tokens.length; i++) {
+                        if(command.arguments().getArgumentAtIndex(i) instanceof LiteralArgument(String literal)){
+                            if(!tokens[i].equalsIgnoreCase(literal)) return false;
+                        }
+                    }
+                    return true;
+                })
                 .sorted((c1, c2) -> Integer.compare(c2.arguments().minRequiredTokens(), c1.arguments().minRequiredTokens()))
                 .toList();
 
@@ -25,58 +32,42 @@ public final class CommandDispatcher {
             return false;
         }
 
-        MatchResult matchResult = MatchResult.noMatch();
         for(Command command : commands) {
-            if(!matchSender(command,  commandSender)) {
-                continue;
-            }
-
-            matchResult = matchArguments(command, tokens);
-            if(matchResult instanceof MatchResult.Success || matchResult instanceof MatchResult.ParseFailure) {
-                break;
-            }
-        }
-
-        switch (matchResult){
-            case MatchResult.Success success-> {
-                CommandContext ctx = new CommandContext(commandSender, success.values());
-                success.command().executor().execute(ctx);
+            var match = match(command, commandSender, tokens);
+            if(match instanceof MatchResult.Success(Map<String, Object> ctxValues)) {
+                command.executor().execute(new CommandContext(commandSender, ctxValues));
                 return true;
             }
-            case MatchResult.ParseFailure fail -> {
-                Exception e = fail.exception();
-                if(e != null) {
-                    commandSender.sendMessage("[!] Could not parse arguments. " + e.getMessage());
-                }
-                return false;
-            }
-            case MatchResult.NoMatch _ -> {
-                commandSender.sendMessage("[!] Could not find any command matching your input.");
-                return false;
-            }
         }
+
+        // TODO: improve feedback for user
+
+        commandSender.sendMessage("[!] Could not find any commands for '" + commandName + "'");
+
+        return false;
     }
 
-    private boolean matchSender(Command command, CommandSender sender) {
-        return command.sender().isInstance(sender);
-    }
+    private MatchResult match(Command command, CommandSender sender, String[] userProvidedArgs) {
+        if(!command.sender().isInstance(sender)) {
+            return MatchResult.senderTypeMismatch(command.sender(), sender.getClass());
+        }
 
-    private MatchResult matchArguments(Command command, String[] userProvidedArgs) {
         final Map<String, Object> ctxValues = new HashMap<>();
 
         int i = 0; // the i-th token
         for(Argument arg : command.arguments().getArguments()) {
             switch (arg) {
-                case LiteralArgument literalArgument -> {
-                    if (i >= userProvidedArgs.length) return MatchResult.noMatch();
-                    if (!literalArgument.literal().equalsIgnoreCase(userProvidedArgs[i])) return MatchResult.noMatch();
+                case LiteralArgument(String literal) -> {
+                    if (i >= userProvidedArgs.length) return MatchResult.notEnoughArguments(command.arguments().minRequiredTokens(), userProvidedArgs.length);
+                    if (!literal.equalsIgnoreCase(userProvidedArgs[i])) return MatchResult.literalMismatch(literal, userProvidedArgs[i]);
                     i++;
                 }
 
                 case InputArgument<?> inputArgument -> {
                     switch (inputArgument.getConsumerType()) {
-                        case TokenConsumer.TokenConsumerType.Exactly(int tokenConsumeCount) ->{
-                            if (userProvidedArgs.length < i + tokenConsumeCount) return MatchResult.noMatch();
+                        case TokenConsumer.TokenConsumerType.Exactly(int tokenConsumeCount) -> {
+                            if (userProvidedArgs.length < i + tokenConsumeCount)
+                                return MatchResult.notEnoughArguments(command.arguments().minRequiredTokens(), userProvidedArgs.length);
                             final String[] parseArguments = Arrays.copyOfRange(userProvidedArgs, i, i + tokenConsumeCount);
 
                             try {
@@ -89,7 +80,8 @@ public final class CommandDispatcher {
                         }
 
                         case TokenConsumer.TokenConsumerType.AtLeast(int tokenConsumeCount) -> {
-                            if (userProvidedArgs.length < i + tokenConsumeCount) return MatchResult.noMatch(); // did not provide enough args
+                            if (userProvidedArgs.length < i + tokenConsumeCount)
+                                return MatchResult.notEnoughArguments(command.arguments().minRequiredTokens(), userProvidedArgs.length);
                             final String[] parseArguments = Arrays.copyOfRange(userProvidedArgs, i, userProvidedArgs.length);
                             try {
                                 Object obj = inputArgument.parse(parseArguments);
@@ -115,11 +107,15 @@ public final class CommandDispatcher {
             }
         }
 
-        if (i != userProvidedArgs.length && !command.arguments().isTokenConsumeCountExactly()) { // user provided too many arguments
-            return MatchResult.noMatch();
+        if(i != userProvidedArgs.length && !command.arguments().isTokenConsumeCountExactly()) { // user provided too many arguments
+            return MatchResult.tooManyArguments(command.arguments().minRequiredTokens(), i);
         }
 
-        return MatchResult.success(command, ctxValues);
+        if(!sender.hasPermission(command.permission())){
+            return MatchResult.noPermission(command.permission());
+        }
+
+        return MatchResult.success(ctxValues);
     }
 
 }
