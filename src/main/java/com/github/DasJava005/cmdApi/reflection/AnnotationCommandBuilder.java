@@ -17,12 +17,12 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.*;
 
-public final class CommandBuilder {
+public final class AnnotationCommandBuilder {
 
     private final InputArgumentRegistry inputArgumentRegistry;
     private final CommandMethodValidator commandMethodValidator = new CommandMethodValidator();
 
-    public CommandBuilder(InputArgumentRegistry inputArgumentRegistry) {
+    public AnnotationCommandBuilder(InputArgumentRegistry inputArgumentRegistry) {
         this.inputArgumentRegistry = inputArgumentRegistry;
     }
 
