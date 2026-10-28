@@ -20,8 +20,7 @@ registry.registerCommand(builder.create());
 ```
 
 ### Creating a command using annotations
-Write the command logic:
-Class name: TestTablistCommand
+Write the command logic first.
 ```java
 @CommandGroup("tablist")
 public class TestTablistCommand {
@@ -40,10 +39,12 @@ CommandRegistry registry = new CommandRegistry(this);
 
 InputArgumentRegistry inputArgumentRegistry = InputArgumentRegistry.defaultRegistry();
 
-var commandBuilder = new ReflectiveCommandBuilder(inputArgumentRegistry);
+CommandBuilder commandBuilder = new CommandBuilder(inputArgumentRegistry);
 
 TestTablistCommand landCommand = new TestTablistCommand();
 
 registry.registerCommands(commandBuilder.buildCommands(landCommand));
 ```
 
+### JitPack
+[![](https://jitpack.io/v/DasJava005/CommandAPI2.svg)](https://jitpack.io/#DasJava005/CommandAPI2)

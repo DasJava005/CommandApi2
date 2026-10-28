@@ -15,10 +15,9 @@ public final class CommandBuilder {
     private List<String> aliases = List.of();
     private String description = "";
 
-    private String permission = "";
-
     private final List<Argument> arguments = new ArrayList<>();
     private Class<? extends CommandSender> sender = Player.class;
+    private String permission = "";
     private CommandExecutor executor = _ -> {};
 
     private CommandBuilder(String label) {
@@ -80,6 +79,7 @@ public final class CommandBuilder {
         return new Command(new GroupInfo(label, aliases, description),
                 new CommandArguments(arguments),
                 sender,
+                permission,
                 executor);
     }
 

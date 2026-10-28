@@ -8,6 +8,8 @@ import java.util.*;
 
 public final class CommandDispatcher {
 
+    //TODO clean up this class
+
     private final CommandProvider commandProvider;
     public CommandDispatcher(CommandProvider commandProvider) {
         this.commandProvider = commandProvider;
@@ -15,6 +17,15 @@ public final class CommandDispatcher {
 
     public boolean execute(@NonNull CommandSender commandSender, @NonNull String commandName, String @NonNull [] tokens) {
         final List<Command> commands = commandProvider.getCommands(commandName).stream()
+                // pre-filter commands that already match with all literals to provide better suggestions
+                .filter(command -> {
+                    for(int i = 0; i < tokens.length; i++) {
+                        if(command.arguments().getArgumentAtIndex(i) instanceof LiteralArgument(String literal)){
+                            if(tokens[i].equalsIgnoreCase(literal)) return false;
+                        }
+                    }
+                    return true;
+                })
                 .sorted((c1, c2) -> Integer.compare(c2.arguments().minRequiredTokens(), c1.arguments().minRequiredTokens()))
                 .toList();
 
@@ -23,59 +34,42 @@ public final class CommandDispatcher {
             return false;
         }
 
-        MatchResult matchResult = MatchResult.noMatch(); //this is also the likeliest command the user tried to execute
         for(Command command : commands) {
-            if(!matchSender(command,  commandSender)) {
-                continue;
-            }
-
-            matchResult = matchArguments(command, tokens);
-            if(matchResult instanceof MatchResult.Success || matchResult instanceof MatchResult.ParseFailure) {
-                break;
-            }
-        }
-
-        switch (matchResult){
-            case MatchResult.Success success-> {
-                CommandContext ctx = new CommandContext(commandSender, success.values());
-                success.command().executor().execute(ctx);
+            var match = match(command, commandSender, tokens);
+            if(match instanceof MatchResult.Success(Map<String, Object> ctxValues)) {
+                command.executor().execute(new CommandContext(commandSender, ctxValues));
                 return true;
             }
-            case MatchResult.ParseFailure fail -> {
-                Exception e = fail.exception();
-                if(e != null) {
-                    commandSender.sendMessage("[!] Could not parse arguments. " + e.getMessage());
-                }
-                return false;
-            }
-            case MatchResult.NoMatch _ -> {
-                commandSender.sendMessage("[!] Could not find any command matching your input.");
-                return false;
-            }
         }
+
+        // TODO: improved feedback
+
+        commandSender.sendMessage("[!] Could not find any commands for '" + commandName + "'");
+
+        return false;
     }
 
-    private boolean matchSender(Command command, CommandSender sender) {
-        return command.sender().isInstance(sender);
-    }
+    private MatchResult match(Command command, CommandSender sender, String[] userProvidedArgs) {
+        if(!command.sender().isInstance(sender)) {
+            return MatchResult.senderTypeMismatch(command.sender(), sender.getClass());
+        }
 
-    private MatchResult matchArguments(Command command, String[] tokens) {
         final Map<String, Object> ctxValues = new HashMap<>();
 
         int i = 0; // the i-th token
         for(Argument arg : command.arguments().getArguments()) {
             switch (arg) {
                 case LiteralArgument literalArgument -> {
-                    if (i >= tokens.length) return MatchResult.noMatch();
-                    if (!literalArgument.literal().equalsIgnoreCase(tokens[i])) return MatchResult.noMatch();
+                    if (i >= userProvidedArgs.length) return MatchResult.noMatch();
+                    if (!literalArgument.literal().equalsIgnoreCase(userProvidedArgs[i])) return MatchResult.noMatch();
                     i++;
                 }
 
                 case InputArgument<?> inputArgument -> {
                     switch (inputArgument.getConsumerType()) {
-                        case TokenConsumer.TokenConsumerType.Exactly(int tokenConsumeCount) ->{
-                            if (tokens.length < i + tokenConsumeCount) return MatchResult.noMatch();
-                            final String[] parseArguments = Arrays.copyOfRange(tokens, i, i + tokenConsumeCount);
+                        case TokenConsumer.TokenConsumerType.Exactly(int tokenConsumeCount) -> {
+                            if (userProvidedArgs.length < i + tokenConsumeCount) return MatchResult.noMatch();
+                            final String[] parseArguments = Arrays.copyOfRange(userProvidedArgs, i, i + tokenConsumeCount);
 
                             try {
                                 Object obj = inputArgument.parse(parseArguments);
@@ -87,66 +81,41 @@ public final class CommandDispatcher {
                         }
 
                         case TokenConsumer.TokenConsumerType.AtLeast(int tokenConsumeCount) -> {
-                            if (tokens.length < i + tokenConsumeCount) return MatchResult.noMatch(); // did not provide enough args
-                            final String[] parseArguments = Arrays.copyOfRange(tokens, i, tokens.length);
+                            if (userProvidedArgs.length < i + tokenConsumeCount) return MatchResult.noMatch(); // did not provide enough args
+                            final String[] parseArguments = Arrays.copyOfRange(userProvidedArgs, i, userProvidedArgs.length);
                             try {
                                 Object obj = inputArgument.parse(parseArguments);
                                 ctxValues.put(inputArgument.key(), obj);
                             } catch (ParseException e) {
                                 return MatchResult.parseException(e);
                             }
-                            i = tokens.length;
+                            i = userProvidedArgs.length;
                         }
 
                         case TokenConsumer.TokenConsumerType.Remaining _ -> {
-                            final String[] parseArguments = Arrays.copyOfRange(tokens, i, tokens.length);
+                            final String[] parseArguments = Arrays.copyOfRange(userProvidedArgs, i, userProvidedArgs.length);
                             try {
                                 Object obj = inputArgument.parse(parseArguments);
                                 ctxValues.put(inputArgument.key(), obj);
                             } catch (ParseException e) {
                                 return MatchResult.parseException(e);
                             }
-                            i = tokens.length;
+                            i = userProvidedArgs.length;
                         }
                     }
                 }
             }
         }
 
-        if (i != tokens.length && !command.arguments().isTokenConsumeCountExactly()) { // user provided too many tokens
-            return MatchResult.noMatch();
+        if(i != userProvidedArgs.length && !command.arguments().isTokenConsumeCountExactly()) { // user provided too many arguments
+            return MatchResult.tooManyArguments(command.arguments().minRequiredTokens(), i);
         }
 
-        return MatchResult.success(command, ctxValues);
-    }
-
-    public List<String> tabComplete(CommandSender commandSender, String commandName, String[] tokens) {
-        final List<Command> commands = commandProvider.getCommands(commandName);
-
-        for (final Command command : commands) {
-            if (!command.sender().isInstance(commandSender)) continue;
-            if(tokens.length > command.arguments().minRequiredTokens()) continue;
-
-            final CommandArguments arguments = command.arguments();
-
-            Argument lastArgument = arguments.getArgumentAtIndex(tokens.length - 1);
-            if (lastArgument == null) continue;
-
-            int lastInputLength = 0;
-            for (int i = tokens.length - 1; i >= 0; i--) {
-                if (lastArgument == arguments.getArgumentAtIndex(i)) { //the map contains the same object for both keys
-                    lastInputLength++;
-                } else
-                    break;
-            }
-
-            return lastArgument.suggestions(commandSender, Arrays.copyOfRange(
-                    tokens,
-                    tokens.length - lastInputLength,
-                    tokens.length));
+        if(!sender.hasPermission(command.permission())){
+            return MatchResult.noPermission(command.permission());
         }
 
-        return List.of();
+        return MatchResult.success(ctxValues);
     }
 
 }

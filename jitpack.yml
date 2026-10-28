@@ -1,2 +1,6 @@
+jdk:
+  - openjdk25
+
 install:
-  - mvn install -DskipTests
+  - chmod +x mvnw
+  - ./mvnw install -DskipTests

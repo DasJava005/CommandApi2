@@ -17,7 +17,6 @@ public class CommandContext {
     public <T> T getSender(Class<T> senderClazz) {
         if(!senderClazz.isInstance(this.sender))
             throw new IllegalArgumentException("Sender must be of type " + senderClazz.getName());
-
         return senderClazz.cast(this.sender);
     }
 

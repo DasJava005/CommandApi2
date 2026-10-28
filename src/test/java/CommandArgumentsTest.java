@@ -4,8 +4,6 @@ import com.github.DasJava005.cmdApi.base.arguments.GreedyArgument;
 import com.github.DasJava005.cmdApi.base.arguments.LiteralArgument;
 import com.github.DasJava005.cmdApi.base.arguments.impl.IntegerArgument;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.List;
 
