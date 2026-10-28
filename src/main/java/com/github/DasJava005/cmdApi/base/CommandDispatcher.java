@@ -42,7 +42,7 @@ public final class CommandDispatcher {
             }
         }
 
-        // TODO: improved feedback
+        // TODO: improve feedback
 
         commandSender.sendMessage("[!] Could not find any commands for '" + commandName + "'");
 
