@@ -1,14 +1,17 @@
 package com.github.DasJava005.cmdApi.testplugin;
 
-import com.github.DasJava005.cmdApi.base.CommandBuilder;
-import com.github.DasJava005.cmdApi.base.CommandRegistry;
 import com.github.DasJava005.cmdApi.base.arguments.GreedyArgument;
 import com.github.DasJava005.cmdApi.base.arguments.InputArguments;
+import com.github.DasJava005.cmdApi.base.builder.CommandBuilder;
+import com.github.DasJava005.cmdApi.base.registry.CommandRegistry;
+import com.github.DasJava005.cmdApi.reflection.AnnotationCommandBuilder;
 import com.github.DasJava005.cmdApi.reflection.InputArgumentRegistry;
 import com.github.DasJava005.cmdApi.testplugin.commands.*;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
+
+import java.lang.annotation.Annotation;
 
 public final class TestPlugin extends JavaPlugin {
 
@@ -46,9 +49,10 @@ public final class TestPlugin extends JavaPlugin {
         );
 
         InputArgumentRegistry inputArgumentRegistry = InputArgumentRegistry.defaultRegistry();
-        com.github.DasJava005.cmdApi.reflection.CommandBuilder commandBuilder = new com.github.DasJava005.cmdApi.reflection.CommandBuilder(inputArgumentRegistry);
+        AnnotationCommandBuilder commandBuilder = new AnnotationCommandBuilder(inputArgumentRegistry);
 
         registry.registerCommands(commandBuilder.buildCommands(new BalCommand()));
+        registry.registerCommands(commandBuilder.buildCommands(new MathCommand()));
     }
 
     @Override

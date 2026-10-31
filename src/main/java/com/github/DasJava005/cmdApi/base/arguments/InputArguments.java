@@ -34,7 +34,6 @@ public enum InputArguments {
     ENTITY_TYPE(EntityType.class, EntityTypeArgument::new),
     MATERIAL(Material.class, MaterialArgument::new);
 
-
     private final Class<?> type;
     private final InputArgumentFactory<?> factory;
 

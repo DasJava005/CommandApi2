@@ -10,12 +10,12 @@ import org.bukkit.entity.Player;
 public class BalCommand {
 
     @Cmd("give #user #amount")
-    public void balGiveCommand(@Sender Player p, @Arg("user") String userName, @Arg("amount") int amount){
+    public void balGiveCommand(@Sender Player p, @Arg("user") String userName, @Arg("amount") int amount) {
         p.sendMessage("GAVE " + userName + ": " + amount);
     }
 
     @Cmd("take #user #amount")
-    public void balTakeCommand(@Sender Player p, @Arg("user") String userName, @Arg("amount") int amount){
+    public void balTakeCommand(@Sender Player p, @Arg("user") String userName, @Arg("amount") int amount) {
         p.sendMessage("TOOK from " + userName + ": " + amount);
     }
 
