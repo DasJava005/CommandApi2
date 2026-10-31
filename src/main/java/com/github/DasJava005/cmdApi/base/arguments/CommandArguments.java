@@ -1,8 +1,4 @@
-package com.github.DasJava005.cmdApi.base;
-
-import com.github.DasJava005.cmdApi.base.arguments.Argument;
-import com.github.DasJava005.cmdApi.base.arguments.TokenConsumer;
-import org.yaml.snakeyaml.tokens.Token;
+package com.github.DasJava005.cmdApi.base.arguments;
 
 import java.util.List;
 

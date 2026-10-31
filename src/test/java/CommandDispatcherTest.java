@@ -1,7 +1,7 @@
 import com.github.DasJava005.cmdApi.base.Command;
-import com.github.DasJava005.cmdApi.base.CommandBuilder;
-import com.github.DasJava005.cmdApi.base.CommandDispatcher;
-import com.github.DasJava005.cmdApi.base.MatchResult;
+import com.github.DasJava005.cmdApi.base.builder.CommandBuilder;
+import com.github.DasJava005.cmdApi.base.registry.dispatcher.CommandDispatcher;
+import com.github.DasJava005.cmdApi.base.registry.dispatcher.MatchResult;
 import com.github.DasJava005.cmdApi.base.arguments.InputArguments;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -53,7 +53,7 @@ public class CommandDispatcherTest {
                 .literal("give")
                 .sender(Player.class)
                 .argument(InputArguments.STRING.createArgument("player"))
-                .argument(InputArguments.INTEGER.createArgument("amount"))
+                .argument(InputArguments.INT.createArgument("amount"))
                 .create();
 
         Player sender = mock(Player.class);
@@ -74,7 +74,7 @@ public class CommandDispatcherTest {
                 .literal("give")
                 .sender(Player.class)
                 .argument(InputArguments.STRING.createArgument("player"))
-                .argument(InputArguments.INTEGER.createArgument("amount"))
+                .argument(InputArguments.INT.createArgument("amount"))
                 .create();
 
         MatchResult result = runMethod(cmd, sender, new String[]{"give", "playerB", "10000000"});

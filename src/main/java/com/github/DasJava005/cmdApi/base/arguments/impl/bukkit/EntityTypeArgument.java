@@ -1,6 +1,6 @@
 package com.github.DasJava005.cmdApi.base.arguments.impl.bukkit;
 
-import com.github.DasJava005.cmdApi.base.ParseException;
+import com.github.DasJava005.cmdApi.base.parser.ParseException;
 import com.github.DasJava005.cmdApi.base.arguments.InputArgument;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;

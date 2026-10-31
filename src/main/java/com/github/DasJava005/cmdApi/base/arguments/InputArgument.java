@@ -1,10 +1,6 @@
 package com.github.DasJava005.cmdApi.base.arguments;
 
-import com.github.DasJava005.cmdApi.base.Parser;
-import com.github.DasJava005.cmdApi.base.Suggestions;
-import org.bukkit.command.CommandSender;
-
-import java.util.List;
+import com.github.DasJava005.cmdApi.base.parser.Parser;
 
 public abstract non-sealed class InputArgument<T> implements Argument, Parser<T> {
 

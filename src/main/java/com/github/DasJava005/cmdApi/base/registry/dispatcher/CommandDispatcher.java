@@ -1,6 +1,10 @@
-package com.github.DasJava005.cmdApi.base;
+package com.github.DasJava005.cmdApi.base.registry.dispatcher;
 
+import com.github.DasJava005.cmdApi.base.Command;
+import com.github.DasJava005.cmdApi.base.CommandContext;
+import com.github.DasJava005.cmdApi.base.parser.ParseException;
 import com.github.DasJava005.cmdApi.base.arguments.*;
+import com.github.DasJava005.cmdApi.base.registry.CommandProvider;
 import org.bukkit.command.CommandSender;
 import org.jspecify.annotations.NonNull;
 
