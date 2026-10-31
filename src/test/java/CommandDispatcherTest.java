@@ -53,7 +53,7 @@ public class CommandDispatcherTest {
                 .literal("give")
                 .sender(Player.class)
                 .argument(InputArguments.STRING.createArgument("player"))
-                .argument(InputArguments.INTEGER.createArgument("amount"))
+                .argument(InputArguments.INT.createArgument("amount"))
                 .create();
 
         Player sender = mock(Player.class);
@@ -74,7 +74,7 @@ public class CommandDispatcherTest {
                 .literal("give")
                 .sender(Player.class)
                 .argument(InputArguments.STRING.createArgument("player"))
-                .argument(InputArguments.INTEGER.createArgument("amount"))
+                .argument(InputArguments.INT.createArgument("amount"))
                 .create();
 
         MatchResult result = runMethod(cmd, sender, new String[]{"give", "playerB", "10000000"});
