@@ -1,11 +1,11 @@
 package com.github.DasJava005.cmdApi.base.arguments;
 
 import com.github.DasJava005.cmdApi.base.arguments.impl.*;
-import com.github.DasJava005.cmdApi.base.arguments.impl.bukkit.EntityTypeArgument;
-import com.github.DasJava005.cmdApi.base.arguments.impl.bukkit.MaterialArgument;
-import com.github.DasJava005.cmdApi.base.arguments.impl.bukkit.VectorArgument;
+import com.github.DasJava005.cmdApi.base.arguments.impl.bukkit.*;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import java.util.UUID;
@@ -32,7 +32,9 @@ public enum InputArguments {
     // bukkit types
     VECTOR(Vector.class, VectorArgument::new),
     ENTITY_TYPE(EntityType.class, EntityTypeArgument::new),
-    MATERIAL(Material.class, MaterialArgument::new);
+    MATERIAL(Material.class, MaterialArgument::new),
+    PLAYER(Player.class, PlayerArgument::new),
+    OFFLINE_PLAYER(OfflinePlayer.class, OfflinePlayerArgument::new);
 
 
     private final Class<?> type;
