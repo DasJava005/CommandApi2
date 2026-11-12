@@ -3,6 +3,7 @@ package com.github.DasJava005.cmdApi.base.registry;
 import com.github.DasJava005.cmdApi.base.Command;
 import com.github.DasJava005.cmdApi.base.arguments.Argument;
 import com.github.DasJava005.cmdApi.base.arguments.CommandArguments;
+import com.github.DasJava005.cmdApi.base.arguments.LiteralArgument;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -23,13 +24,24 @@ public final class CommandTabCompleter {
         final List<Command> commands = commandProvider.getCommands(commandName);
         final List<String> completions = new ArrayList<>();
 
+        if(tokens.length == 0) return completions;
+
         for (final Command command : commands) {
             if (!command.sender().isInstance(commandSender)) continue;
-            if(tokens.length > command.arguments().minRequiredTokens()) continue;
             final CommandArguments arguments = command.arguments();
 
             Argument lastArgument = arguments.getArgumentAtIndex(tokens.length - 1);
             if (lastArgument == null) continue;
+
+            boolean allPreviousLiteralsMatch = true;
+            for(int i = 0; i < tokens.length - 1; i++) {
+                if(arguments.getArgumentAtIndex(i) instanceof LiteralArgument(String literal)) {
+                    if(!tokens[i].equalsIgnoreCase(literal)) {
+                        allPreviousLiteralsMatch = false;
+                    }
+                }
+            }
+            if(!allPreviousLiteralsMatch) continue;
 
             int lastInputLength = 0;
             for (int i = tokens.length - 1; i >= 0; i--) {

@@ -62,7 +62,7 @@ public class CommandArguments {
     public Argument getArgumentAtIndex(int index) {
         int i = 0;
         for(Argument argument : arguments) {
-            if(argument.getConsumerType() instanceof TokenConsumer.TokenConsumerType.Exactly(int tokens)){
+            if(argument.getConsumerType() instanceof TokenConsumer.TokenConsumerType.Exactly(int tokens)) {
                 if(index >= i && index < i + tokens){
                     return argument;
                 }

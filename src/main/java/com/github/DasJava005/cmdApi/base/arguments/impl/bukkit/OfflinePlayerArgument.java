@@ -17,7 +17,8 @@ public class OfflinePlayerArgument extends InputArgument<OfflinePlayer> {
 
     @Override
     public List<String> suggestions(CommandSender sender, String[] tokens) {
-        return Bukkit.getOnlinePlayers().stream().map(Player::getName).filter(name -> name.toLowerCase().startsWith(tokens[0])).toList();
+        final String input = tokens[0].toLowerCase();
+        return Bukkit.getOnlinePlayers().stream().map(Player::getName).filter(name -> name.toLowerCase().startsWith(input)).toList();
     }
 
     @Override

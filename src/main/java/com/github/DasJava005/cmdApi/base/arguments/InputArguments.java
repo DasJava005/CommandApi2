@@ -36,7 +36,6 @@ public enum InputArguments {
     PLAYER(Player.class, PlayerArgument::new),
     OFFLINE_PLAYER(OfflinePlayer.class, OfflinePlayerArgument::new);
 
-
     private final Class<?> type;
     private final InputArgumentFactory<?> factory;
 
