@@ -53,6 +53,7 @@ public final class TestPlugin extends JavaPlugin {
 
         registry.registerCommands(commandBuilder.buildCommands(new BalCommand()));
         registry.registerCommands(commandBuilder.buildCommands(new MathCommand()));
+        registry.registerCommands(commandBuilder.buildCommands(new LandCommand()));
     }
 
     @Override
