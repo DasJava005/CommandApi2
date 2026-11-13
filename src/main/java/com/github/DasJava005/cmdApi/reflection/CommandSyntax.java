@@ -1,5 +1,7 @@
 package com.github.DasJava005.cmdApi.reflection;
 
+import com.github.DasJava005.cmdApi.base.Command;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;

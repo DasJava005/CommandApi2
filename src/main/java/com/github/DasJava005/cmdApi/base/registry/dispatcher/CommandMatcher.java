@@ -14,28 +14,36 @@ public class CommandMatcher {
     // tokens = input provided by user
     public MatchResult match(Command command, CommandSender sender, String[] tokens) {
         if (!command.sender().isInstance(sender))
-            return new MatchResult.NoMatch(MatchFailReason.SENDER_TYPE_MISMATCH, MatchProgress.of(0));
+            return new MatchResult.NoMatch(command, MatchFailReason.SENDER_TYPE_MISMATCH, MatchProgress.of(0));
         if (!sender.hasPermission(command.permission()))
-            return new MatchResult.NoMatch(MatchFailReason.NO_PERMISSION, MatchProgress.of(0));
+            return new MatchResult.NoMatch(command, MatchFailReason.NO_PERMISSION, MatchProgress.of(0));
 
         final Map<String, Object> ctxValues = new HashMap<>();
+
+        int matchedLiterals = 0;
+        int matchedInputArguments = 0;
 
         CommandArguments arguments = command.arguments();
         int i = 0;
         for (Argument arg : arguments.getArguments()) {
             switch (arg) {
                 case LiteralArgument(String literal) -> {
+                    if(i >= tokens.length) {
+                        return new MatchResult.NoMatch(command, MatchFailReason.NOT_ENOUGH_ARGUMENTS, MatchProgress.of(ProgressCalculatorRule.DEFAULT_CALCULATOR.calculateProgress(arguments, i, tokens.length, matchedLiterals, matchedInputArguments)));
+                    }
                     String currentToken = tokens[i++];
                     if (!literal.equals(currentToken)) {
-                        return new MatchResult.NoMatch(MatchFailReason.LITERAL_MISMATCH, MatchProgress.of(0));
+                        return new MatchResult.NoMatch(command, MatchFailReason.NOT_ENOUGH_ARGUMENTS, MatchProgress.of(ProgressCalculatorRule.DEFAULT_CALCULATOR.calculateProgress(arguments, i, tokens.length, matchedLiterals, matchedInputArguments)));
                     }
+                    matchedLiterals++;
                 }
 
                 case GreedyArgument greedyArgument -> {
                     final String[] parseArguments = Arrays.copyOfRange(tokens, i, tokens.length);
                     ParseResult<?> parseResult = greedyArgument.parse(parseArguments);
                     ctxValues.put(greedyArgument.key(),  parseResult);
-                    // GreedyArgument is always last in list, the loop ends here
+                    i = tokens.length;
+                    // GreedyArgument is always last in list, the loop ends here - return a match
                 }
 
                 case InputArgument<?> inputArg -> {
@@ -50,18 +58,21 @@ public class CommandMatcher {
                         if (parseResult instanceof ParseResult.ParseSuccess<?>(Object resultObject)) {
                             ctxValues.put(inputArg.key(), resultObject);
                             success = true;
+                            i++;
                             break;
                         }
 
                         if (parseResult instanceof ParseResult.ParseMismatch<?>) {
-                            return new MatchResult.NoMatch(MatchFailReason.PARSE_ERROR, MatchProgress.of(0));
+                            return new MatchResult.NoMatch(command, MatchFailReason.PARSE_ERROR, MatchProgress.of(ProgressCalculatorRule.DEFAULT_CALCULATOR.calculateProgress(arguments, i, tokens.length, matchedLiterals, matchedInputArguments)));
                         }
 
                         i++;
                     } while (i < tokens.length);
 
                     if (!success) {
-                        return new MatchResult.NoMatch(MatchFailReason.PARSE_ERROR, MatchProgress.of(0));
+                        return new MatchResult.NoMatch(command, MatchFailReason.PARSE_ERROR, MatchProgress.of(ProgressCalculatorRule.DEFAULT_CALCULATOR.calculateProgress(arguments, i, tokens.length, matchedLiterals, matchedInputArguments)));
+                    } else {
+                        matchedInputArguments++;
                     }
                 }
             }
@@ -70,18 +81,64 @@ public class CommandMatcher {
         return new MatchResult.Match(command, ctxValues);
     }
 
-    public sealed interface MatchResult permits MatchResult.Match, MatchResult.NoMatch {
-        public static record Match(Command cmd, Map<String, Object> ctx) implements MatchResult {}
-        public static record NoMatch(MatchFailReason reason, MatchProgress matchProgress) implements MatchResult {}
+    public static interface ProgressCalculator {
+        abstract double calculateProgress(CommandArguments commandArguments,
+                                         int processedTokens,
+                                         int totalTokens,
+                                         int literalProgress,
+                                         int inputArgProgress);
+
+        public static double ratio(int value, int total) {
+            return total == 0 ? 0.0 : (double) value / total;
+        }
     }
 
-    public record MatchProgress(float progress) implements Comparable<MatchProgress> {
+    public static enum ProgressCalculatorRule implements ProgressCalculator {
+
+        DEFAULT_CALCULATOR {
+            public double calculateProgress(
+                    CommandArguments arguments,
+                    int processedTokens,
+                    int totalTokens,
+                    int matchedLiterals,
+                    int matchedInputArguments) {
+
+                double score = 0.0;
+                double weight = 0.0;
+
+                if (totalTokens > 0) {
+                    score += ProgressCalculator.ratio(processedTokens, totalTokens) * 0.4;
+                    weight += 0.4;
+                }
+
+                if (arguments.numLiterals() > 0) {
+                    score += ProgressCalculator.ratio(matchedLiterals, arguments.numLiterals()) * 0.4;
+                    weight += 0.4;
+                }
+
+                if (arguments.numInputArgs() > 0) {
+                    score += ProgressCalculator.ratio(matchedInputArguments, arguments.numInputArgs()) * 0.2;
+                    weight += 0.2;
+                }
+
+                return weight == 0.0 ? 0.0 : score / weight;
+            }
+        }
+
+    }
+
+    public sealed interface MatchResult permits MatchResult.Match, MatchResult.NoMatch {
+        public static record Match(Command cmd, Map<String, Object> ctx) implements MatchResult {}
+        public static record NoMatch(Command triedCmd, MatchFailReason reason, MatchProgress matchProgress) implements MatchResult {}
+    }
+
+    public record MatchProgress(double progress) implements Comparable<MatchProgress> {
         @Override
         public int compareTo(CommandMatcher.MatchProgress o) {
             return Double.compare(progress, o.progress);
         }
 
-        public static MatchProgress of(float progress) {
+        public static MatchProgress of(double progress) {
             return new MatchProgress(progress);
         }
     }
