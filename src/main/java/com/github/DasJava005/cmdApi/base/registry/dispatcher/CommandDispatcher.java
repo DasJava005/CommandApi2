@@ -1,15 +1,12 @@
 package com.github.DasJava005.cmdApi.base.registry.dispatcher;
 
-import com.github.DasJava005.cmdApi.base.Command;
 import com.github.DasJava005.cmdApi.base.CommandContext;
 import com.github.DasJava005.cmdApi.base.arguments.*;
 import com.github.DasJava005.cmdApi.base.registry.CommandProvider;
-import com.github.DasJava005.cmdApi.reflection.CommandSyntax;
 import org.bukkit.command.CommandSender;
 import org.jspecify.annotations.NonNull;
 
 import java.util.*;
-import java.util.stream.Stream;
 
 public final class CommandDispatcher {
 
@@ -58,7 +55,7 @@ public final class CommandDispatcher {
                 .max(Comparator.comparing(CommandMatcher.MatchResult.NoMatch::matchProgress));
 
         bestMatch.ifPresent(match ->
-                commandSender.sendMessage(match.triedCmd().syntax()));
+                commandSender.sendMessage("Did you look for:" + match.triedCmd().syntax() + " ?"));
 
         return false;
     }
