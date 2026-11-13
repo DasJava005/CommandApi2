@@ -58,7 +58,6 @@ public class CommandMatcher {
                         if (parseResult instanceof ParseResult.ParseSuccess<?>(Object resultObject)) {
                             ctxValues.put(inputArg.key(), resultObject);
                             success = true;
-                            i++;
                             break;
                         }
 
