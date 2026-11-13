@@ -1,7 +1,7 @@
 package com.github.DasJava005.cmdApi.base.arguments.impl;
 
 import com.github.DasJava005.cmdApi.base.arguments.InputArgument;
-import com.github.DasJava005.cmdApi.base.parser.ParseException;
+import com.github.DasJava005.cmdApi.base.parser.ParseResult;
 
 public class CharArgument extends InputArgument<Character> {
 
@@ -10,12 +10,11 @@ public class CharArgument extends InputArgument<Character> {
     }
 
     @Override
-    public Character parse(String[] tokens) {
+    public ParseResult<Character> parse(String[] tokens) {
         if(tokens.length != 1) {
-            throw new ParseException(tokens[0], Character.class);
+            return ParseResult.mismatch(tokens[0], Character.class);
         }
-
-        return tokens[0].charAt(0);
+        return ParseResult.success(tokens[0].charAt(0));
     }
 
 }

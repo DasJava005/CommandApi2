@@ -1,7 +1,7 @@
 package com.github.DasJava005.cmdApi.base.arguments.impl.bukkit;
 
 import com.github.DasJava005.cmdApi.base.arguments.InputArgument;
-import com.github.DasJava005.cmdApi.base.parser.ParseException;
+import com.github.DasJava005.cmdApi.base.parser.ParseResult;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -15,12 +15,12 @@ public class PlayerArgument extends InputArgument<Player> {
     }
 
     @Override
-    public Player parse(String[] tokens) {
+    public ParseResult<Player> parse(String[] tokens) {
         Player p = Bukkit.getPlayerExact(tokens[0]);
         if (p == null) {
-            throw new ParseException("Player '" + tokens[0] + "' was not found!");
+            return ParseResult.mismatch(tokens[0], Player.class);
         }
-        return p;
+        return ParseResult.success(p);
     }
 
     @Override

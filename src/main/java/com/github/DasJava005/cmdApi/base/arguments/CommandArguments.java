@@ -1,16 +1,35 @@
 package com.github.DasJava005.cmdApi.base.arguments;
 
+import com.github.DasJava005.cmdApi.reflection.annotations.Arg;
+
 import java.util.List;
 
 public class CommandArguments {
 
     private final List<Argument> arguments;
+    private final int numLiterals;
+    private final int numInputArgs;
+    private final int numGreedyArgs; // basically this is smth. like hasGreedy bcs Args can only have one GreedyArg
 
     private final int minTokenConsumeCount;
     private final boolean isTokenConsumeCountExact;
 
     public CommandArguments(List<Argument> arguments) {
         this.arguments = List.copyOf(arguments);
+
+        int numLiterals = 0, numInputArgs = 0, numGreedyArgs = 0;
+
+        for(Argument arg : arguments) {
+            switch (arg) {
+                case LiteralArgument _ -> numLiterals++;
+                case GreedyArgument _ -> numGreedyArgs++;
+                case InputArgument<?> _ -> numInputArgs++;
+            }
+        }
+
+        this.numLiterals = numLiterals;
+        this.numInputArgs = numInputArgs;
+        this.numGreedyArgs = numGreedyArgs;
 
         for (int i = 0; i < this.arguments.size(); i++) {
             Argument argument = this.arguments.get(i);
@@ -87,6 +106,18 @@ public class CommandArguments {
         }
 
         return true;
+    }
+
+    public int numLiterals() {
+        return numLiterals;
+    }
+
+    public int numInputArgs() {
+        return numInputArgs;
+    }
+
+    public int numGreedyArgs() {
+        return numGreedyArgs;
     }
 
     @Override
