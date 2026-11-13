@@ -1,7 +1,7 @@
 package com.github.DasJava005.cmdApi.base.arguments.impl;
 
-import com.github.DasJava005.cmdApi.base.parser.ParseException;
 import com.github.DasJava005.cmdApi.base.arguments.InputArgument;
+import com.github.DasJava005.cmdApi.base.parser.ParseResult;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;
@@ -13,14 +13,14 @@ public final class BooleanArgument extends InputArgument<Boolean> {
     }
 
     @Override
-    public Boolean parse(String[] tokens) {
+    public ParseResult<Boolean> parse(String[] tokens) {
         if(tokens[0].equalsIgnoreCase("true") || tokens[0].equalsIgnoreCase("1")){
-            return true;
+            return ParseResult.success(true);
         }
         if(tokens[0].equalsIgnoreCase("false") || tokens[0].equalsIgnoreCase("0")){
-            return false;
+            return ParseResult.success(false);
         }
-        throw new ParseException(tokens[0], Boolean.class);
+        return ParseResult.mismatch(tokens[0],  Boolean.class);
     }
 
     @Override

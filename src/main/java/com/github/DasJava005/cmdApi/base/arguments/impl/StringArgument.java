@@ -1,6 +1,7 @@
 package com.github.DasJava005.cmdApi.base.arguments.impl;
 
 import com.github.DasJava005.cmdApi.base.arguments.InputArgument;
+import com.github.DasJava005.cmdApi.base.parser.ParseResult;
 
 public final class StringArgument extends InputArgument<String> {
 
@@ -9,12 +10,12 @@ public final class StringArgument extends InputArgument<String> {
     }
 
     @Override
-    public String parse(String[] tokens) {
+    public ParseResult<String> parse(String[] tokens) {
         StringBuilder sb = new StringBuilder();
         for (String token : tokens) {
             sb.append(token).append(" ");
         }
-        return sb.toString().trim();
+        return ParseResult.success(sb.toString().trim());
     }
 
 }

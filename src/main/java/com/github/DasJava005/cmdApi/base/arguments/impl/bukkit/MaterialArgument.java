@@ -1,7 +1,7 @@
 package com.github.DasJava005.cmdApi.base.arguments.impl.bukkit;
 
-import com.github.DasJava005.cmdApi.base.parser.ParseException;
 import com.github.DasJava005.cmdApi.base.arguments.InputArgument;
+import com.github.DasJava005.cmdApi.base.parser.ParseResult;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 
@@ -21,12 +21,12 @@ public final class MaterialArgument extends InputArgument<Material> {
     }
 
     @Override
-    public Material parse(String[] tokens) {
+    public ParseResult<Material> parse(String[] tokens) {
         Material material = Material.matchMaterial(tokens[0]);
         if (material == null) {
-            throw new ParseException("Invalid material value: " + tokens[0]);
+            return ParseResult.mismatch(tokens[0], Material.class);
         }
-        return material;
+        return ParseResult.success(material);
     }
 
     @Override

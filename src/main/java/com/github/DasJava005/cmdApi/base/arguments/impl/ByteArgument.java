@@ -1,7 +1,7 @@
 package com.github.DasJava005.cmdApi.base.arguments.impl;
 
 import com.github.DasJava005.cmdApi.base.arguments.InputArgument;
-import com.github.DasJava005.cmdApi.base.parser.ParseException;
+import com.github.DasJava005.cmdApi.base.parser.ParseResult;
 
 public class ByteArgument extends InputArgument<Byte> {
 
@@ -10,11 +10,11 @@ public class ByteArgument extends InputArgument<Byte> {
     }
 
     @Override
-    public Byte parse(String[] tokens) {
+    public ParseResult<Byte> parse(String[] tokens) {
         try{
-            return Byte.parseByte(tokens[0]);
+            return ParseResult.success(Byte.parseByte(tokens[0]));
         }catch (Exception e) {
-            throw new ParseException(tokens[0], Byte.class);
+            return ParseResult.mismatch(tokens[0], Byte.class);
         }
     }
 

@@ -1,11 +1,12 @@
 package com.github.DasJava005.cmdApi.base.arguments.impl.bukkit;
 
-import com.github.DasJava005.cmdApi.base.parser.ParseException;
 import com.github.DasJava005.cmdApi.base.arguments.InputArgument;
+import com.github.DasJava005.cmdApi.base.parser.ParseResult;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+import java.text.ParseException;
 import java.util.List;
 
 public final class VectorArgument extends InputArgument<Vector> {
@@ -22,17 +23,21 @@ public final class VectorArgument extends InputArgument<Vector> {
     }
 
     @Override
-    public Vector parse(String[] tokens) {
+    public ParseResult<Vector> parse(String[] tokens) {
+        if(tokens.length != requiredTokens) {
+            return ParseResult.insufficientTokens(3, tokens.length);
+        }
+
         double[] components = new double[tokens.length];
         for (int i = 0; i < tokens.length; i++) {
             try{
                 components[i] = Double.parseDouble(tokens[i]);
             }catch (Exception e){
-                throw new ParseException(tokens[i], Double.class);
+                return ParseResult.mismatch(tokens[i], Vector.class);
             }
         }
 
-        return new Vector(components[0], components[1], components[2]);
+        return ParseResult.success(new Vector(components[0], components[1], components[2]));
     }
 
     @Override

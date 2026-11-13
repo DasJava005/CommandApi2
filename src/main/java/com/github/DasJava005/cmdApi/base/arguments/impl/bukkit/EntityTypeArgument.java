@@ -1,7 +1,7 @@
 package com.github.DasJava005.cmdApi.base.arguments.impl.bukkit;
 
-import com.github.DasJava005.cmdApi.base.parser.ParseException;
 import com.github.DasJava005.cmdApi.base.arguments.InputArgument;
+import com.github.DasJava005.cmdApi.base.parser.ParseResult;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
 
@@ -21,11 +21,11 @@ public final class EntityTypeArgument extends InputArgument<EntityType> {
     }
 
     @Override
-    public EntityType parse(String[] tokens) {
+    public ParseResult<EntityType> parse(String[] tokens) {
         try {
-            return EntityType.valueOf(tokens[0].toUpperCase());
+            return ParseResult.success(EntityType.valueOf(tokens[0]));
         } catch (IllegalArgumentException e) {
-            throw new ParseException(tokens[0], EntityType.class);
+            return ParseResult.mismatch(tokens[0], EntityType.class);
         }
     }
 
