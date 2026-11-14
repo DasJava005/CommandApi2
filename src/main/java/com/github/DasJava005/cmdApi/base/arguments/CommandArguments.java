@@ -1,111 +1,58 @@
 package com.github.DasJava005.cmdApi.base.arguments;
 
-import com.github.DasJava005.cmdApi.reflection.annotations.Arg;
-
+import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 public class CommandArguments {
 
     private final List<Argument> arguments;
+
+    private final int numRequiredTokens;
+
     private final int numLiterals;
     private final int numInputArgs;
-    private final int numGreedyArgs; // basically this is smth. like hasGreedy bcs Args can only have one GreedyArg
 
-    private final int minTokenConsumeCount;
-    private final boolean isTokenConsumeCountExact;
+    private final boolean swallowArgument;
 
     public CommandArguments(List<Argument> arguments) {
         this.arguments = List.copyOf(arguments);
 
-        int numLiterals = 0, numInputArgs = 0, numGreedyArgs = 0;
+        int numRequiredTokens = 0;
+        int numLiterals = 0, numInputArgs = 0;
+        boolean swallowArgument = false;
 
         for(Argument arg : arguments) {
             switch (arg) {
-                case LiteralArgument _ -> numLiterals++;
-                case GreedyArgument _ -> numGreedyArgs++;
-                case InputArgument<?> _ -> numInputArgs++;
+                case StaticArgument staticArgument -> {
+                    numRequiredTokens += staticArgument.numTokens();
+                    switch (staticArgument) {
+                        case LiteralArgument _ -> numLiterals++;
+                        case TypeArgument<?> _ -> numInputArgs++;
+                    }
+                }
+                case SwallowArgument swArg -> {
+                    if(swArg != arguments.getLast()) {
+                        throw new IllegalArgumentException("Arguments can only have one SwallowArgument, which must be last in the list!");
+                    }
+                    swallowArgument = true;
+                }
             }
         }
+
+        this.numRequiredTokens = numRequiredTokens;
 
         this.numLiterals = numLiterals;
         this.numInputArgs = numInputArgs;
-        this.numGreedyArgs = numGreedyArgs;
-
-        for (int i = 0; i < this.arguments.size(); i++) {
-            Argument argument = this.arguments.get(i);
-
-            if (!(argument.getConsumerType() instanceof TokenConsumer.TokenConsumerType.Exactly) && i != this.arguments.size() - 1) {
-                throw new IllegalArgumentException("Argument with non-exact token consumer type must be the last object in the list.");
-            }
-        }
-
-        switch (arguments.getLast().getConsumerType()) {
-            case TokenConsumer.TokenConsumerType.Exactly exactly -> {
-                this.minTokenConsumeCount = exactly.tokens();
-                this.isTokenConsumeCountExact = true;
-            }
-            case TokenConsumer.TokenConsumerType.AtLeast atLeast -> {
-                this.minTokenConsumeCount = arguments.stream()
-                        .map(Argument::getConsumerType)
-                        .filter(c -> c instanceof TokenConsumer.TokenConsumerType.Exactly)
-                        .map(c -> (TokenConsumer.TokenConsumerType.Exactly)c)
-                        .mapToInt(TokenConsumer.TokenConsumerType.Exactly::tokens)
-                        .sum()
-                + atLeast.tokens();
-                this.isTokenConsumeCountExact = false;
-            }
-            case TokenConsumer.TokenConsumerType.Remaining remaining -> {
-                this.minTokenConsumeCount = arguments.stream()
-                        .map(Argument::getConsumerType)
-                        .filter(c -> c instanceof TokenConsumer.TokenConsumerType.Exactly)
-                        .map(c -> (TokenConsumer.TokenConsumerType.Exactly)c)
-                        .mapToInt(TokenConsumer.TokenConsumerType.Exactly::tokens)
-                        .sum();
-                this.isTokenConsumeCountExact = false;
-            }
-        }
+        this.swallowArgument = swallowArgument;
     }
 
     public List<Argument> getArguments() {
         return arguments;
     }
 
-    public int minRequiredTokens() {
-        return minTokenConsumeCount;
-    }
-
-    public boolean isTokenConsumeCountExactly() {
-        return isTokenConsumeCountExact;
-    }
-
-    public Argument getArgumentAtIndex(int index) {
-        int i = 0;
-        for(Argument argument : arguments) {
-            if(argument.getConsumerType() instanceof TokenConsumer.TokenConsumerType.Exactly(int tokens)) {
-                if(index >= i && index < i + tokens){
-                    return argument;
-                }
-                i += tokens;
-            } else {
-                return arguments.getLast();
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (!(obj instanceof CommandArguments other)) return false;
-        if (arguments.size() != other.arguments.size()) return false;
-
-        for (int i = 0; i < arguments.size(); i++) {
-            if (arguments.get(i) != other.arguments.get(i)) {
-                return false;
-            }
-        }
-
-        return true;
+    public int numRequiredTokens() {
+        return numRequiredTokens;
     }
 
     public int numLiterals() {
@@ -116,19 +63,62 @@ public class CommandArguments {
         return numInputArgs;
     }
 
-    public int numGreedyArgs() {
-        return numGreedyArgs;
+    public boolean hasSwallowArgument() {
+        return swallowArgument;
     }
 
-    @Override
-    public int hashCode() {
-        int result = 1;
+    public Iterator<Argument> iterator() {
+        return arguments.iterator();
+    }
 
-        for (Argument argument : arguments) {
-            result = 31 * result + argument.hashCode();
+    public Argument getLast() {
+        return arguments.getLast();
+    }
+
+    /**
+     * Returns the argument corresponding to the specified token position.
+     * <p>
+     * Static arguments may consume multiple tokens. Consequently, multiple
+     * consecutive token positions can correspond to the same argument.
+     * If a {@link SwallowArgument} is present, it matches all token positions
+     * beyond the required tokens.
+     * <p>
+     * Example:
+     * <pre>
+     * Arguments: [LiteralArgument("teleport"), VectorArgument]
+     *
+     * Token position | Argument
+     * ---------------|-------------------------
+     * 0              | LiteralArgument
+     * 1              | VectorArgument
+     * 2              | VectorArgument
+     * 3              | VectorArgument
+     * </pre>
+     *
+     * @param position the zero-based position of the token
+     * @return an {@link Optional} containing the corresponding argument,
+     *         or {@link Optional#empty()} if no argument matches the position
+     * @throws IndexOutOfBoundsException if the position is negative
+     */
+    public Optional<Argument> getAtTokenPosition(int position) {
+        if(position < 0) throw new IndexOutOfBoundsException("position cannot be negative!");
+        if(position >= numRequiredTokens) {
+            if (swallowArgument){
+               return Optional.of(getLast());
+            } else return Optional.empty();
         }
 
-        return result;
+        int j = 0;
+        for (Argument a : arguments) {
+            if (a instanceof StaticArgument arg) {
+                if (position < j + arg.numTokens()) {
+                    return Optional.of(arg);
+                }
+                j += arg.numTokens();
+            }
+        }
+
+        return Optional.empty();
     }
 
 }

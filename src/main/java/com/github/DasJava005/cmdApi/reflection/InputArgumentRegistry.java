@@ -1,8 +1,8 @@
 package com.github.DasJava005.cmdApi.reflection;
 
-import com.github.DasJava005.cmdApi.base.arguments.InputArgument;
-import com.github.DasJava005.cmdApi.base.arguments.InputArgumentFactory;
-import com.github.DasJava005.cmdApi.base.arguments.InputArguments;
+import com.github.DasJava005.cmdApi.base.arguments.TypeArgument;
+import com.github.DasJava005.cmdApi.base.arguments.TypeArgumentFactory;
+import com.github.DasJava005.cmdApi.base.arguments.TypeArguments;
 import com.github.DasJava005.cmdApi.reflection.utils.Primitives;
 
 import java.util.HashMap;
@@ -16,24 +16,24 @@ public final class InputArgumentRegistry {
         return registry;
     }
 
-    private final Map<Class<?>, InputArgumentFactory<?>> registry = new HashMap<>();
+    private final Map<Class<?>, TypeArgumentFactory<?>> registry = new HashMap<>();
 
-    public <T> void register(Class<T> clazz, InputArgumentFactory<T> factory) {
+    public <T> void register(Class<T> clazz, TypeArgumentFactory<T> factory) {
         registry.put(Primitives.wrapPrimitive(clazz), factory);
     }
 
     public void registerDefaults() {
-        for(var defArg : InputArguments.values()) {
+        for(var defArg : TypeArguments.values()) {
             registry.put(Primitives.wrapPrimitive(defArg.type()), defArg.factory());
         }
     }
 
     @SuppressWarnings("unchecked")
-    public <T> InputArgument<T> create(String key, Class<T> clazz) {
+    public <T> TypeArgument<T> create(String key, Class<T> clazz) {
         if(!supports(Primitives.wrapPrimitive(clazz))) {
             return null;
         }
-        return (InputArgument<T>) registry.get(Primitives.wrapPrimitive(clazz)).create(key);
+        return (TypeArgument<T>) registry.get(Primitives.wrapPrimitive(clazz)).create(key);
     }
 
     public boolean supports(Class<?> clazz) {

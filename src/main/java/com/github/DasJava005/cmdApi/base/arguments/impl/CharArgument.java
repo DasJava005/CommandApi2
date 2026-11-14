@@ -1,9 +1,9 @@
 package com.github.DasJava005.cmdApi.base.arguments.impl;
 
-import com.github.DasJava005.cmdApi.base.arguments.InputArgument;
+import com.github.DasJava005.cmdApi.base.arguments.TypeArgument;
 import com.github.DasJava005.cmdApi.base.parser.ParseResult;
 
-public class CharArgument extends InputArgument<Character> {
+public class CharArgument extends TypeArgument<Character> {
 
     public CharArgument(String key) {
         super(key);

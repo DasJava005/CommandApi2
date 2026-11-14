@@ -1,15 +1,10 @@
 package com.github.DasJava005.cmdApi.base.registry;
 
 import com.github.DasJava005.cmdApi.base.Command;
-import com.github.DasJava005.cmdApi.base.arguments.Argument;
-import com.github.DasJava005.cmdApi.base.arguments.CommandArguments;
-import com.github.DasJava005.cmdApi.base.arguments.LiteralArgument;
+import com.github.DasJava005.cmdApi.base.arguments.*;
 import org.bukkit.command.CommandSender;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public final class CommandTabCompleter {
@@ -30,12 +25,16 @@ public final class CommandTabCompleter {
             if (!command.sender().isInstance(commandSender)) continue;
             final CommandArguments arguments = command.arguments();
 
-            Argument lastArgument = arguments.getArgumentAtIndex(tokens.length - 1);
-            if (lastArgument == null) continue;
+            Optional<Argument> lA = arguments.getAtTokenPosition(tokens.length - 1);
+            if (lA.isEmpty()) continue;
+            if(!(lA.get() instanceof StaticArgument lastArgument)) continue;
 
             boolean allPreviousLiteralsMatch = true;
             for(int i = 0; i < tokens.length - 1; i++) {
-                if(arguments.getArgumentAtIndex(i) instanceof LiteralArgument(String literal)) {
+                Optional<Argument> optionalArgument = arguments.getAtTokenPosition(i);
+                if(optionalArgument.isEmpty()) continue;
+                Argument argument = optionalArgument.get();
+                if(argument instanceof LiteralArgument(String literal)) {
                     if(!tokens[i].equalsIgnoreCase(literal)) {
                         allPreviousLiteralsMatch = false;
                     }
@@ -45,7 +44,7 @@ public final class CommandTabCompleter {
 
             int lastInputLength = 0;
             for (int i = tokens.length - 1; i >= 0; i--) {
-                if (arguments.getArgumentAtIndex(i) != lastArgument) break;
+                if (arguments.getAtTokenPosition(i).get() != lastArgument) break;
                 lastInputLength++;
             }
 

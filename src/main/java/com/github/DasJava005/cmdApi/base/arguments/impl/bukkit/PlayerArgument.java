@@ -1,6 +1,6 @@
 package com.github.DasJava005.cmdApi.base.arguments.impl.bukkit;
 
-import com.github.DasJava005.cmdApi.base.arguments.InputArgument;
+import com.github.DasJava005.cmdApi.base.arguments.TypeArgument;
 import com.github.DasJava005.cmdApi.base.parser.ParseResult;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-public class PlayerArgument extends InputArgument<Player> {
+public class PlayerArgument extends TypeArgument<Player> {
 
     public PlayerArgument(String key) {
         super(key);

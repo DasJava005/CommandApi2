@@ -40,13 +40,13 @@ public class CommandMatcher {
 
                 case GreedyArgument greedyArgument -> {
                     final String[] parseArguments = Arrays.copyOfRange(tokens, i, tokens.length);
-                    ParseResult<?> parseResult = greedyArgument.parse(parseArguments);
+                    String parseResult = greedyArgument.swallow(parseArguments);
                     ctxValues.put(greedyArgument.key(),  parseResult);
                     i = tokens.length;
                     // GreedyArgument is always last in list, the loop ends here - return a match
                 }
 
-                case InputArgument<?> inputArg -> {
+                case TypeArgument<?> inputArg -> {
                     int start = i;
 
                     boolean success = false;

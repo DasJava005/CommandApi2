@@ -1,13 +1,9 @@
 package com.github.DasJava005.cmdApi.reflection;
 
 import com.github.DasJava005.cmdApi.base.Command;
-import com.github.DasJava005.cmdApi.base.arguments.CommandArguments;
+import com.github.DasJava005.cmdApi.base.arguments.*;
 import com.github.DasJava005.cmdApi.base.CommandExecutor;
 import com.github.DasJava005.cmdApi.base.GroupInfo;
-import com.github.DasJava005.cmdApi.base.arguments.Argument;
-import com.github.DasJava005.cmdApi.base.arguments.GreedyArgument;
-import com.github.DasJava005.cmdApi.base.arguments.InputArgument;
-import com.github.DasJava005.cmdApi.base.arguments.LiteralArgument;
 import com.github.DasJava005.cmdApi.reflection.annotations.Cmd;
 import com.github.DasJava005.cmdApi.reflection.annotations.CommandGroup;
 import com.github.DasJava005.cmdApi.reflection.annotations.Greedy;
@@ -70,8 +66,8 @@ public final class AnnotationCommandBuilder {
                 if(p.isAnnotationPresent(Greedy.class)) {
                     arguments.add(new GreedyArgument(key));
                 } else {
-                    InputArgument<?> inputArgument = inputArgumentRegistry.create(key, p.getType());
-                    arguments.add(inputArgument);
+                    TypeArgument<?> typeArgument = inputArgumentRegistry.create(key, p.getType());
+                    arguments.add(typeArgument);
                 }
             }
         }

@@ -1,6 +1,6 @@
 package com.github.DasJava005.cmdApi.base.arguments.impl.bukkit;
 
-import com.github.DasJava005.cmdApi.base.arguments.InputArgument;
+import com.github.DasJava005.cmdApi.base.arguments.TypeArgument;
 import com.github.DasJava005.cmdApi.base.parser.ParseResult;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
@@ -8,7 +8,7 @@ import org.bukkit.command.CommandSender;
 import java.util.Arrays;
 import java.util.List;
 
-public final class MaterialArgument extends InputArgument<Material> {
+public final class MaterialArgument extends TypeArgument<Material> {
 
     private final List<String> materials;
 

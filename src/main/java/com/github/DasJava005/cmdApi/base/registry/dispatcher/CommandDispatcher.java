@@ -4,12 +4,10 @@ import com.github.DasJava005.cmdApi.base.Command;
 import com.github.DasJava005.cmdApi.base.CommandContext;
 import com.github.DasJava005.cmdApi.base.arguments.*;
 import com.github.DasJava005.cmdApi.base.registry.CommandProvider;
-import com.github.DasJava005.cmdApi.reflection.CommandSyntax;
 import org.bukkit.command.CommandSender;
 import org.jspecify.annotations.NonNull;
 
 import java.util.*;
-import java.util.stream.Stream;
 
 public final class CommandDispatcher {
 
@@ -23,15 +21,7 @@ public final class CommandDispatcher {
 
     public boolean execute(@NonNull CommandSender commandSender, @NonNull String commandName, String @NonNull [] tokens) {
         final List<Command> commands = commandProvider.getCommands(commandName).stream()
-                .filter(command -> { // pre-filter commands that already match with all literals
-                    for(int i = 0; i < tokens.length; i++) {
-                        if(command.arguments().getArgumentAtIndex(i) instanceof LiteralArgument(String literal)){
-                            if(!tokens[i].equalsIgnoreCase(literal)) return false;
-                        }
-                    }
-                    return true;
-                })
-                .sorted((c1, c2) -> Integer.compare(c2.arguments().minRequiredTokens(), c1.arguments().minRequiredTokens()))
+                .sorted((c1, c2) -> Integer.compare(c2.arguments().numRequiredTokens(), c1.arguments().numRequiredTokens()))
                 .toList();
 
         List<CommandMatcher.MatchResult.NoMatch> failedCommands = new ArrayList<>();
