@@ -11,7 +11,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class CommandArgumentsTest {
+public class CommandMatcherTest {
 
     private final CommandMatcher matcher = new CommandMatcher();
 
@@ -104,6 +104,26 @@ public class CommandArgumentsTest {
         CommandMatcher.MatchResult res = matcher.match(cmd2, sender, new String[]{"location", "7", "8", "9"});
 
         assertInstanceOf(CommandMatcher.MatchResult.Match.class, res);
+    }
+
+    @Test
+    public void permissionCheckWithSuccess() {
+        Player sender = mock(Player.class);
+        when(sender.hasPermission("amdin.superSecretLogin")).thenReturn(false);
+
+        CommandMatcher.MatchResult res1 = matcher.match(cmd4, sender, new String[]{"admin", "passWord"});
+
+        assertInstanceOf(CommandMatcher.MatchResult.NoMatch.Permission.class, res1);
+    }
+
+    @Test
+    public void permissionCheckWithoutSuccess() {
+        Player sender = mock(Player.class);
+        when(sender.hasPermission("amdin.superSecretLogin")).thenReturn(true);
+
+        CommandMatcher.MatchResult res1 = matcher.match(cmd4, sender, new String[]{"admin", "passWord"});
+
+        assertInstanceOf(CommandMatcher.MatchResult.Match.class, res1);
     }
 
 }
