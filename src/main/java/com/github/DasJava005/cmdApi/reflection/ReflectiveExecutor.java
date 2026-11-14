@@ -5,7 +5,7 @@ import com.github.DasJava005.cmdApi.base.CommandExecutor;
 import com.github.DasJava005.cmdApi.reflection.annotations.Arg;
 import com.github.DasJava005.cmdApi.reflection.annotations.Sender;
 import com.github.DasJava005.cmdApi.reflection.validation.CommandMethodValidator;
-import com.github.DasJava005.cmdApi.reflection.utils.Primitives;
+import com.github.DasJava005.cmdApi.utils.Primitives;
 
 import java.lang.reflect.Parameter;
 import java.util.LinkedList;
