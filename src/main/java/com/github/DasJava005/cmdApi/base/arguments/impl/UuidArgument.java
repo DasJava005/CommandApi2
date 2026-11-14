@@ -1,11 +1,11 @@
 package com.github.DasJava005.cmdApi.base.arguments.impl;
 
-import com.github.DasJava005.cmdApi.base.arguments.InputArgument;
+import com.github.DasJava005.cmdApi.base.arguments.TypeArgument;
 import com.github.DasJava005.cmdApi.base.parser.ParseResult;
 
 import java.util.UUID;
 
-public class UuidArgument extends InputArgument<UUID> {
+public class UuidArgument extends TypeArgument<UUID> {
 
     public UuidArgument(String key) {
         super(key);

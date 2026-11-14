@@ -1,30 +1,29 @@
 package com.github.DasJava005.cmdApi.base.arguments.impl.bukkit;
 
-import com.github.DasJava005.cmdApi.base.arguments.InputArgument;
+import com.github.DasJava005.cmdApi.base.arguments.TypeArgument;
 import com.github.DasJava005.cmdApi.base.parser.ParseResult;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import java.text.ParseException;
 import java.util.List;
 
-public final class VectorArgument extends InputArgument<Vector> {
+public final class VectorArgument extends TypeArgument<Vector> {
 
-    private final int requiredTokens = 3;
+    private static final int REQUIRED_TOKENS = 3;
 
     public VectorArgument(String key) {
         super(key);
     }
 
     @Override
-    public TokenConsumerType getConsumerType() {
-        return TokenConsumerType.exactly(requiredTokens);
+    public int numTokens() {
+        return REQUIRED_TOKENS;
     }
 
     @Override
     public ParseResult<Vector> parse(String[] tokens) {
-        if(tokens.length != requiredTokens) {
+        if(tokens.length != REQUIRED_TOKENS) {
             return ParseResult.insufficientTokens(3, tokens.length);
         }
 

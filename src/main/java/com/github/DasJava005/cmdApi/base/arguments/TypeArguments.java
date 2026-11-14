@@ -13,7 +13,7 @@ import java.util.UUID;
 /**
  * Provides default implementations for certain types.
  */
-public enum InputArguments {
+public enum TypeArguments {
 
     // java primitives
     BOOLEAN(Boolean.class, BooleanArgument::new),
@@ -37,9 +37,9 @@ public enum InputArguments {
     OFFLINE_PLAYER(OfflinePlayer.class, OfflinePlayerArgument::new);
 
     private final Class<?> type;
-    private final InputArgumentFactory<?> factory;
+    private final TypeArgumentFactory<?> factory;
 
-    private <T> InputArguments(Class<T> type, InputArgumentFactory<T> factory) {
+    private <T> TypeArguments(Class<T> type, TypeArgumentFactory<T> factory) {
         this.type = type;
         this.factory = factory;
     }
@@ -48,11 +48,11 @@ public enum InputArguments {
         return type;
     }
 
-    public InputArgumentFactory<?> factory() {
+    public TypeArgumentFactory<?> factory() {
         return factory;
     }
 
-    public InputArgument<?> createArgument(String key) {
+    public TypeArgument<?> createArgument(String key) {
         return factory.create(key);
     }
 

@@ -1,10 +1,9 @@
 package com.github.DasJava005.cmdApi.base.arguments.impl;
 
-import com.github.DasJava005.cmdApi.base.arguments.InputArgument;
+import com.github.DasJava005.cmdApi.base.arguments.TypeArgument;
 import com.github.DasJava005.cmdApi.base.parser.ParseResult;
-import com.github.DasJava005.cmdApi.base.parser.Parser;
 
-public class LongArgument extends InputArgument<Long> {
+public class LongArgument extends TypeArgument<Long> {
 
     public LongArgument(String key) {
         super(key);

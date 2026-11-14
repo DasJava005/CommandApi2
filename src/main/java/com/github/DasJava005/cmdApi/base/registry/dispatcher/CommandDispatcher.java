@@ -21,7 +21,7 @@ public final class CommandDispatcher {
 
     public boolean execute(@NonNull CommandSender commandSender, @NonNull String commandName, String @NonNull [] tokens) {
         final List<Command> commands = commandProvider.getCommands(commandName).stream()
-                .sorted((c1, c2) -> Integer.compare(c2.arguments().minRequiredTokens(), c1.arguments().minRequiredTokens()))
+                .sorted((c1, c2) -> Integer.compare(c2.arguments().numRequiredTokens(), c1.arguments().numRequiredTokens()))
                 .toList();
 
         List<CommandMatcher.MatchResult.NoMatch> failedCommands = new ArrayList<>();

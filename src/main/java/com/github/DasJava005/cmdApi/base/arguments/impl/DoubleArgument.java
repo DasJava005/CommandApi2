@@ -1,12 +1,12 @@
 package com.github.DasJava005.cmdApi.base.arguments.impl;
 
-import com.github.DasJava005.cmdApi.base.arguments.InputArgument;
+import com.github.DasJava005.cmdApi.base.arguments.TypeArgument;
 import com.github.DasJava005.cmdApi.base.parser.ParseResult;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;
 
-public final class DoubleArgument extends InputArgument<Double> {
+public final class DoubleArgument extends TypeArgument<Double> {
 
     public DoubleArgument(String key) {
         super(key);

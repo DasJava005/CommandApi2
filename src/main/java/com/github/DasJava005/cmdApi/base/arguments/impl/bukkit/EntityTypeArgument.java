@@ -1,6 +1,6 @@
 package com.github.DasJava005.cmdApi.base.arguments.impl.bukkit;
 
-import com.github.DasJava005.cmdApi.base.arguments.InputArgument;
+import com.github.DasJava005.cmdApi.base.arguments.TypeArgument;
 import com.github.DasJava005.cmdApi.base.parser.ParseResult;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-public final class EntityTypeArgument extends InputArgument<EntityType> {
+public final class EntityTypeArgument extends TypeArgument<EntityType> {
 
     private final List<String> entities;
 

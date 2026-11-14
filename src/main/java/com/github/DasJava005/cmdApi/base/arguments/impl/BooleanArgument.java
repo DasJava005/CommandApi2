@@ -1,12 +1,12 @@
 package com.github.DasJava005.cmdApi.base.arguments.impl;
 
-import com.github.DasJava005.cmdApi.base.arguments.InputArgument;
+import com.github.DasJava005.cmdApi.base.arguments.TypeArgument;
 import com.github.DasJava005.cmdApi.base.parser.ParseResult;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;
 
-public final class BooleanArgument extends InputArgument<Boolean> {
+public final class BooleanArgument extends TypeArgument<Boolean> {
 
     public BooleanArgument(String key) {
         super(key);

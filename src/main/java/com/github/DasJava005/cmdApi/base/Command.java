@@ -3,7 +3,6 @@ package com.github.DasJava005.cmdApi.base;
 import com.github.DasJava005.cmdApi.base.arguments.*;
 import org.bukkit.entity.Player;
 
-import java.awt.*;
 import java.util.List;
 
 public record Command(GroupInfo groupInfo, CommandArguments arguments, Class<?> sender, String permission, CommandExecutor executor) {
@@ -31,7 +30,7 @@ public record Command(GroupInfo groupInfo, CommandArguments arguments, Class<?> 
             switch (arg) {
                 case LiteralArgument(String literal) -> sb.append(literal).append(" ");
                 case GreedyArgument _ -> sb.append("<text>");
-                case InputArgument<?> inputArg -> sb.append(inputArg.key()).append(" ");
+                case TypeArgument<?> inputArg -> sb.append(inputArg.key()).append(" ");
             }
         }
 
