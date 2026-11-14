@@ -9,387 +9,95 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CommandMatcher {
+public final class CommandMatcher {
 
-    // tokens = input provided by user
     public MatchResult match(Command command, CommandSender sender, String[] tokens) {
         if (!command.sender().isInstance(sender))
-            return new MatchResult.NoMatch(command, MatchFailReason.SENDER_TYPE_MISMATCH, MatchProgress.of(0));
+            return new MatchResult.NoMatch.SenderTypeMismatch(command.sender(), sender.getClass());
+
         if (!sender.hasPermission(command.permission()))
-            return new MatchResult.NoMatch(command, MatchFailReason.NO_PERMISSION, MatchProgress.of(0));
+            return new MatchResult.NoMatch.Permission(command.permission());
+
+        final CommandArguments arguments = command.arguments();
+
+        if(tokens.length < arguments.numRequiredTokens())
+            return new MatchResult.NoMatch.NotEnoughArguments(tokens.length,  arguments.numRequiredTokens());
+
+        if(tokens.length > arguments.numRequiredTokens() && !arguments.hasSwallowArgument())
+            return new MatchResult.NoMatch.TooManyArguments(tokens.length, arguments.numRequiredTokens());
 
         final Map<String, Object> ctxValues = new HashMap<>();
-
-        int matchedLiterals = 0;
-        int matchedInputArguments = 0;
-
-        CommandArguments arguments = command.arguments();
         int i = 0;
         for (Argument arg : arguments.getArguments()) {
-            switch (arg) {
-                case LiteralArgument(String literal) -> {
-                    if(i >= tokens.length) {
-                        return new MatchResult.NoMatch(command, MatchFailReason.NOT_ENOUGH_ARGUMENTS, MatchProgress.of(ProgressCalculatorRule.DEFAULT_CALCULATOR.calculateProgress(arguments, i, tokens.length, matchedLiterals, matchedInputArguments)));
-                    }
-                    String currentToken = tokens[i++];
-                    if (!literal.equals(currentToken)) {
-                        return new MatchResult.NoMatch(command, MatchFailReason.NOT_ENOUGH_ARGUMENTS, MatchProgress.of(ProgressCalculatorRule.DEFAULT_CALCULATOR.calculateProgress(arguments, i, tokens.length, matchedLiterals, matchedInputArguments)));
-                    }
-                    matchedLiterals++;
-                }
+            if(arg instanceof StaticArgument argument) {
 
-                case GreedyArgument greedyArgument -> {
-                    final String[] parseArguments = Arrays.copyOfRange(tokens, i, tokens.length);
-                    String parseResult = greedyArgument.swallow(parseArguments);
-                    ctxValues.put(greedyArgument.key(),  parseResult);
-                    i = tokens.length;
-                    // GreedyArgument is always last in list, the loop ends here - return a match
-                }
-
-                case TypeArgument<?> inputArg -> {
-                    int start = i;
-
-                    boolean success = false;
-
-                    do {
-                        String[] parseArguments = Arrays.copyOfRange(tokens, start, i + 1);
-                        ParseResult<?> parseResult = inputArg.parse(parseArguments);
-
-                        if (parseResult instanceof ParseResult.ParseSuccess<?>(Object resultObject)) {
-                            ctxValues.put(inputArg.key(), resultObject);
-                            success = true;
-                            break;
+                switch (argument) {
+                    case LiteralArgument(String literal) -> {
+                        if(!literal.equalsIgnoreCase(tokens[i])){
+                            return new MatchResult.NoMatch.LiteralMismatch(tokens[i], literal);
                         }
-
-                        if (parseResult instanceof ParseResult.ParseMismatch<?>) {
-                            return new MatchResult.NoMatch(command, MatchFailReason.PARSE_ERROR, MatchProgress.of(ProgressCalculatorRule.DEFAULT_CALCULATOR.calculateProgress(arguments, i, tokens.length, matchedLiterals, matchedInputArguments)));
-                        }
-
                         i++;
-                    } while (i < tokens.length);
-
-                    if (!success) {
-                        return new MatchResult.NoMatch(command, MatchFailReason.PARSE_ERROR, MatchProgress.of(ProgressCalculatorRule.DEFAULT_CALCULATOR.calculateProgress(arguments, i, tokens.length, matchedLiterals, matchedInputArguments)));
-                    } else {
-                        matchedInputArguments++;
                     }
+
+                    case TypeArgument<?> typeArgument -> {
+                        int start = i;
+                        i += typeArgument.numTokens();
+
+                        String[] parseTokens = Arrays.copyOfRange(tokens, start, i);
+                        ParseResult<?> parseResult = typeArgument.parse(parseTokens);
+
+                        switch (parseResult) {
+                            case ParseResult.ParseSuccess<?> success -> ctxValues.put(typeArgument.key(), success.resultObject());
+                            case ParseResult.ParseMismatch<?> mismatch -> {
+                                return new MatchResult.NoMatch.ParseMismatch(mismatch);
+                            }
+                        }
+
+                    }
+                } // end of switch
+
+            } else if(arg instanceof SwallowArgument swallowArg) {
+                if(swallowArg instanceof GreedyArgument greedyArgument) {
+                    final String[] remainingTokens = Arrays.copyOfRange(tokens, i, tokens.length);
+                    ctxValues.put(greedyArgument.key(), greedyArgument.swallow(remainingTokens));
+                    break;
                 }
             }
         }
 
-        return new MatchResult.Match(command, ctxValues);
-    }
-
-    public static interface ProgressCalculator {
-        abstract double calculateProgress(CommandArguments commandArguments,
-                                         int processedTokens,
-                                         int totalTokens,
-                                         int literalProgress,
-                                         int inputArgProgress);
-
-        public static double ratio(int value, int total) {
-            return total == 0 ? 0.0 : (double) value / total;
-        }
-    }
-
-    public static enum ProgressCalculatorRule implements ProgressCalculator {
-
-        DEFAULT_CALCULATOR {
-            public double calculateProgress(
-                    CommandArguments arguments,
-                    int processedTokens,
-                    int totalTokens,
-                    int matchedLiterals,
-                    int matchedInputArguments) {
-
-                double score = 0.0;
-                double weight = 0.0;
-
-                if (totalTokens > 0) {
-                    score += ProgressCalculator.ratio(processedTokens, totalTokens) * 0.4;
-                    weight += 0.4;
-                }
-
-                if (arguments.numLiterals() > 0) {
-                    score += ProgressCalculator.ratio(matchedLiterals, arguments.numLiterals()) * 0.4;
-                    weight += 0.4;
-                }
-
-                if (arguments.numInputArgs() > 0) {
-                    score += ProgressCalculator.ratio(matchedInputArguments, arguments.numInputArgs()) * 0.2;
-                    weight += 0.2;
-                }
-
-                return weight == 0.0 ? 0.0 : score / weight;
-            }
-        }
-
+        return new MatchResult.Match(ctxValues);
     }
 
     public sealed interface MatchResult permits MatchResult.Match, MatchResult.NoMatch {
-        public static record Match(Command cmd, Map<String, Object> ctx) implements MatchResult {}
-        public static record NoMatch(Command triedCmd, MatchFailReason reason, MatchProgress matchProgress) implements MatchResult {}
-    }
-
-    public record MatchProgress(double progress) implements Comparable<MatchProgress> {
-        @Override
-        public int compareTo(CommandMatcher.MatchProgress o) {
-            return Double.compare(progress, o.progress);
+        record Match(Map<String, Object> ctx) implements MatchResult {
         }
 
-        public static MatchProgress of(double progress) {
-            return new MatchProgress(progress);
-        }
-    }
+        sealed interface NoMatch extends MatchResult permits
+                NoMatch.LiteralMismatch,
+                NoMatch.NotEnoughArguments,
+                NoMatch.ParseMismatch,
+                NoMatch.Permission,
+                NoMatch.SenderTypeMismatch,
+                NoMatch.TooManyArguments {
 
-    public enum MatchFailReason {
-        NO_PERMISSION,
-        PARSE_ERROR,
-        NOT_ENOUGH_ARGUMENTS,
-        LITERAL_MISMATCH,
-        TOO_MANY_ARGUMENTS,
-        SENDER_TYPE_MISMATCH,
-    }
-
-    /*
-
-    public sealed interface MatchResult permits
-            MatchResult.NoMatch,
-            MatchResult.NoPermission,
-            MatchResult.NotEnoughArguments,
-            MatchResult.ParseFailure,
-            MatchResult.SenderTypeMismatch,
-            MatchResult.LiteralMismatch,
-            MatchResult.Success,
-            MatchResult.TooManyArguments {
-
-        record Success(Map<String, Object> ctxValues) implements MatchResult {}
-
-        record NoMatch() implements MatchResult {}
-
-        record ParseFailure(String userInput, Class<?> expectedType) implements MatchResult {}
-        record NoPermission(String permission) implements MatchResult {}
-        record SenderTypeMismatch(Class<?> expectedSenderType, Class<?> providedSenderType) implements MatchResult {}
-        record LiteralMismatch(String expected, String provided) implements MatchResult {}
-        record TooManyArguments(int required, int provided) implements MatchResult {}
-        record NotEnoughArguments(int commandRequiresAtLeast, int provided) implements MatchResult {}
-
-        public static MatchResult success(Map<String, Object> ctx) {
-            return new MatchResult.Success(ctx);
-        }
-
-        public static MatchResult parseException(String userInput, Class<?> expectedType) {
-            return new MatchResult.ParseFailure(userInput, expectedType);
-        }
-
-        public static MatchResult noMatch() {
-            return new MatchResult.NoMatch();
-        }
-
-        public static MatchResult noPermission(String permission) {
-            return new MatchResult.NoPermission(permission);
-        }
-
-        public static MatchResult senderTypeMismatch(Class<?> expectedSenderType, Class<?> providedSenderType) {
-            return new MatchResult.SenderTypeMismatch(expectedSenderType, providedSenderType);
-        }
-
-        public static MatchResult literalMismatch(String expected, String provided) {
-            return new MatchResult.LiteralMismatch(expected, provided);
-        }
-
-        public static MatchResult tooManyArguments(int required, int provided) {
-            return new TooManyArguments(required, provided);
-        }
-
-        public static MatchResult notEnoughArguments(int commandRequiresAtLeast, int provided) {
-            return new MatchResult.NotEnoughArguments(commandRequiresAtLeast, provided);
-        }
-    }
-
-/*
-
-        final Map<String, Object> ctxValues = new HashMap<>(); // build context
-        int i = 0; // the i-th token
-        for(Argument arg : command.arguments().getArguments()) {
-            switch (arg) {
-                case LiteralArgument(String literal) -> {
-                    if (i >= userProvidedArgs.length) return MatchResult.notEnoughArguments(command.arguments().minRequiredTokens(), userProvidedArgs.length);
-                    if (!literal.equalsIgnoreCase(userProvidedArgs[i])) return MatchResult.literalMismatch(literal, userProvidedArgs[i]);
-                    i++;
-                }
-
-                case InputArgument<?> inputArgument -> {
-                    switch (inputArgument.getConsumerType()) {
-                        case TokenConsumer.TokenConsumerType.Exactly(int tokenConsumeCount) -> {
-                            if (userProvidedArgs.length < i + tokenConsumeCount)
-                                return MatchResult.notEnoughArguments(command.arguments().minRequiredTokens(), userProvidedArgs.length);
-                            final String[] parseArguments = Arrays.copyOfRange(userProvidedArgs, i, i + tokenConsumeCount);
-
-                            try {
-                                Object obj = inputArgument.parse(parseArguments);
-                                ctxValues.put(inputArgument.key(), obj);
-                            } catch (TypeCastException e) {
-                                return MatchResult.parseException(e);
-                            }
-                            i += tokenConsumeCount;
-                        }
-
-                        case TokenConsumer.TokenConsumerType.AtLeast(int tokenConsumeCount) -> {
-                            if (userProvidedArgs.length < i + tokenConsumeCount)
-                                return MatchResult.notEnoughArguments(command.arguments().minRequiredTokens(), userProvidedArgs.length);
-                            final String[] parseArguments = Arrays.copyOfRange(userProvidedArgs, i, userProvidedArgs.length);
-                            try {
-                                Object obj = inputArgument.parse(parseArguments);
-                                ctxValues.put(inputArgument.key(), obj);
-                            } catch (TypeCastException e) {
-                                return MatchResult.parseException(e);
-                            }
-                            i = userProvidedArgs.length;
-                        }
-
-                        case TokenConsumer.TokenConsumerType.Remaining _ -> {
-                            final String[] parseArguments = Arrays.copyOfRange(userProvidedArgs, i, userProvidedArgs.length);
-                            try {
-                                Object obj = inputArgument.parse(parseArguments);
-                                ctxValues.put(inputArgument.key(), obj);
-                            } catch (TypeCastException e) {
-                                return MatchResult.parseException(e);
-                            }
-                            i = userProvidedArgs.length;
-                        }
-                    }
-                }
-            }
-        }
-
-        if(i != userProvidedArgs.length && !command.arguments().isTokenConsumeCountExactly()) { // user provided too many arguments
-            return MatchResult.tooManyArguments(command.arguments().minRequiredTokens(), i);
-        }
-
-        return MatchResult.success(ctxValues);
-    }
-*/
-/*
-    public sealed interface MatchResult {
-        record Match(Map<String, Object> ctxValues) implements MatchResult {
-        }
-
-        record NoMatch(FailReason failReason, String message) implements MatchResult {
-        }
-
-        public static MatchResult match(Map<String, Object> ctxValues) {
-            return new Match(ctxValues);
-        }
-
-        public enum FailReason {
-            NO_PERMISSION,
-
-            NOT_ENOUGH_ARGUMENTS,
-
-            INVALID_SENDER,
-
-            LITERAL_MISMATCH,
-
-            PARSE_NOT_POSSIBLE,
-            ;
-
-            FailReason() {
-
+            record ParseMismatch(ParseResult.ParseMismatch<?> parseMismatch) implements NoMatch {
             }
 
-            public MatchResult matchResult(String message) {
-                return new NoMatch(this, message);
+            record LiteralMismatch(String provided, String required) implements NoMatch {
+            }
+
+            record SenderTypeMismatch(Class<?> required, Class<?> provided) implements NoMatch {
+            }
+
+            record Permission(String requiredPermission) implements NoMatch {
+            }
+
+            record NotEnoughArguments(int provided, int required) implements NoMatch {
+            }
+
+            record TooManyArguments(int provided, int required) implements NoMatch {
             }
         }
     }
-*/
-/*
-    public abstract sealed class MatchResult implements Comparable<MatchResult> permits
-            MatchResult.NoMatch,
-            MatchResult.NoPermission,
-            MatchResult.NotEnoughArguments,
-            MatchResult.ParseFailure,
-            MatchResult.SenderTypeMismatch,
-            MatchResult.LiteralMismatch,
-            MatchResult.Success,
-            MatchResult.TooManyArguments {
 
-        protected final int severeLevel;
-
-        public MatchResult(int severeLevel) {
-            this.severeLevel = severeLevel;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if(o == this) return true;
-            if (!(o instanceof MatchResult other)) return false;
-            return other.severeLevel == this.severeLevel;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(severeLevel);
-        }
-
-        @Override
-        public final int compareTo(CommandMatcher.MatchResult o) {
-            return Integer.compare(this.severeLevel, o.severeLevel);
-        }
-
-        record Success(Map<String, Object> ctxValues) extends MatchResult {}
-
-        record NoMatch() implements MatchResult {}
-
-        record ParseFailure(String userInput, Class<?> expectedType) implements MatchResult {}
-
-        record NoPermission(String permission) implements MatchResult {}
-
-        record SenderTypeMismatch(Class<?> expectedSenderType, Class<?> providedSenderType) implements MatchResult {
-        }
-
-        record LiteralMismatch(String expected, String provided) implements MatchResult {
-        }
-
-        record TooManyArguments(int required, int provided) implements MatchResult {
-        }
-
-        record NotEnoughArguments(int commandRequiresAtLeast, int provided) implements MatchResult {
-        }
-
-        public static MatchResult success(Map<String, Object> ctx) {
-            return new MatchResult.Success(ctx);
-        }
-
-        public static MatchResult parseException(ParseException exception) {
-            return new MatchResult.ParseFailure(exception);
-        }
-
-        public static MatchResult noMatch() {
-            return new MatchResult.NoMatch();
-        }
-
-        public static MatchResult noPermission(String permission) {
-            return new MatchResult.NoPermission(permission);
-        }
-
-        public static MatchResult senderTypeMismatch(Class<?> expectedSenderType, Class<?> providedSenderType) {
-            return new MatchResult.SenderTypeMismatch(expectedSenderType, providedSenderType);
-        }
-
-        public static MatchResult literalMismatch(String expected, String provided) {
-            return new MatchResult.LiteralMismatch(expected, provided);
-        }
-
-        public static MatchResult tooManyArguments(int required, int provided) {
-            return new TooManyArguments(required, provided);
-        }
-
-        public static MatchResult notEnoughArguments(int commandRequiresAtLeast, int provided) {
-            return new MatchResult.NotEnoughArguments(commandRequiresAtLeast, provided);
-        }
-
-    }
-*/
 }

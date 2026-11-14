@@ -29,20 +29,13 @@ public final class CommandDispatcher {
         for(Command command :  commands) {
             CommandMatcher.MatchResult result = commandMatcher.match(command,  commandSender, tokens);
             switch (result) {
-                case CommandMatcher.MatchResult.Match(Command cmd, Map<String, Object> ctx) -> {
-                    cmd.executor().execute(new CommandContext(commandSender, ctx));
+                case CommandMatcher.MatchResult.Match(Map<String, Object> ctx) -> {
+                    command.executor().execute(new CommandContext(commandSender, ctx));
                     return true;
                 }
                 case CommandMatcher.MatchResult.NoMatch noMatch -> failedCommands.add(noMatch);
             }
         }
-
-        // Find the most likely failed match
-        Optional<CommandMatcher.MatchResult.NoMatch> bestMatch = failedCommands.stream()
-                .max(Comparator.comparing(CommandMatcher.MatchResult.NoMatch::matchProgress));
-
-        bestMatch.ifPresent(match ->
-                commandSender.sendMessage(match.triedCmd().syntax()));
 
         return false;
     }
