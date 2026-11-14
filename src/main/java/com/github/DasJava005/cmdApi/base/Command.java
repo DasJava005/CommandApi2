@@ -31,7 +31,7 @@ public record Command(GroupInfo groupInfo, CommandArguments arguments, Class<?> 
             switch (arg) {
                 case LiteralArgument(String literal) -> sb.append(literal).append(" ");
                 case GreedyArgument _ -> sb.append("<text>");
-                case InputArgument<?> inputArg -> sb.append(inputArg.getClass().getGenericSuperclass().getClass().getTypeName()).append(" ");
+                case InputArgument<?> inputArg -> sb.append(inputArg.key()).append(" ");
             }
         }
 
