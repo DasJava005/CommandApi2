@@ -1,7 +1,8 @@
-package com.github.DasJava005.cmdApi.base.registry;
+package com.github.DasJava005.cmdApi.base.integration;
 
 import com.github.DasJava005.cmdApi.base.Command;
 import com.github.DasJava005.cmdApi.base.arguments.*;
+import com.github.DasJava005.cmdApi.base.registry.CommandProvider;
 import org.bukkit.command.CommandSender;
 
 import java.util.*;
