@@ -59,7 +59,7 @@ public final class CommandBuilder {
         return this;
     }
 
-    public CommandBuilder literal(String literal){
+    public CommandBuilder literal(String literal) {
         this.arguments.add(new LiteralArgument(literal));
         return this;
     }
