@@ -56,36 +56,38 @@ public final class CommandDispatcher {
         return false;
     }
 
+    // TODO: create an interfaces that return the messages
     private String getUserFeedback(MatchResult result) {
         return switch (result) {
-            case MatchResult.Match ignored ->
-                    "Command executed successfully.";
+            case MatchResult.Match _ ->
+                    "[!] Command executed successfully.";
 
-            case MatchResult.NoMatch.ParseMismatch mismatch ->
-                    "The provided argument has an invalid format.";
+            case MatchResult.NoMatch.ParseMismatch(ParseResult.ParseMismatch<?> parseMismatch) ->
+                    "[!] Could not parse argument: %s to %s"
+                            .formatted(parseMismatch.providedInput(), parseMismatch.expectedType().getSimpleName());
 
             case MatchResult.NoMatch.LiteralMismatch mismatch ->
-                    "Expected '%s', but received '%s'."
+                    "[!] Expected '%s', but received '%s'."
                             .formatted(mismatch.required(), mismatch.provided());
 
             case MatchResult.NoMatch.SenderTypeMismatch mismatch ->
-                    "This command can only be executed by %s."
+                    "[!] This command can only be executed by %s."
                             .formatted(mismatch.required().getSimpleName());
 
             case MatchResult.NoMatch.Permission permission ->
-                    "You do not have the required permission: %s."
+                    "[!] You do not have the required permission: %s."
                             .formatted(permission.requiredPermission());
 
             case MatchResult.NoMatch.NotEnoughArguments arguments ->
-                    "Not enough arguments provided. Expected %d, but received %d."
+                    "[!] Not enough arguments provided. Expected %d, but received %d."
                             .formatted(arguments.required(), arguments.provided());
 
             case MatchResult.NoMatch.TooManyArguments arguments ->
-                    "Too many arguments provided. Expected %d, but received %d."
+                    "[!] Too many arguments provided. Expected %d, but received %d."
                             .formatted(arguments.required(), arguments.provided());
 
             case MatchResult.NoMatch ignored ->
-                    "The command could not be matched.";
+                    "[!] The command could not be matched.";
         };
     }
 
