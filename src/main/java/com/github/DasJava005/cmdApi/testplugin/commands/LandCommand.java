@@ -21,7 +21,7 @@ public class LandCommand {
     }
 
     @Cmd("members add #target")
-    public void membersAdd(@Sender Player sender, @Arg("target")OfflinePlayer target) {
+    public void membersAdd(@Sender Player sender, @Arg("target")Player target) {
         sender.sendMessage("Command: /land members add target");
     }
 

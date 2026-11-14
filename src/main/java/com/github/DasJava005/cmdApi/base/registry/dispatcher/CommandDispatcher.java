@@ -22,7 +22,7 @@ public final class CommandDispatcher {
     }
 
     public boolean execute(@NonNull CommandSender commandSender, @NonNull String commandName, String @NonNull [] tokens) {
-        final List<CommandMatcher.MatchResult> matches = commandProvider.getCommands(commandName).stream()
+        final List<Command> commands = commandProvider.getCommands(commandName).stream()
                 .filter(command -> { // pre-filter commands that already match with all literals
                     for(int i = 0; i < tokens.length; i++) {
                         if(command.arguments().getArgumentAtIndex(i) instanceof LiteralArgument(String literal)){
@@ -32,29 +32,23 @@ public final class CommandDispatcher {
                     return true;
                 })
                 .sorted((c1, c2) -> Integer.compare(c2.arguments().minRequiredTokens(), c1.arguments().minRequiredTokens()))
-                .map(cmd -> commandMatcher.match(cmd, commandSender, tokens))
                 .toList();
 
-        Optional<CommandMatcher.MatchResult.Match> optMatch = matches.stream()
-                .filter(matchResult -> matchResult instanceof CommandMatcher.MatchResult.Match)
-                .map(CommandMatcher.MatchResult.Match.class::cast)
-                .findFirst();
+        List<CommandMatcher.MatchResult.NoMatch> failedCommands = new ArrayList<>();
 
-        if(optMatch.isPresent()) {
-            CommandMatcher.MatchResult.Match match = optMatch.get();
-            match.cmd().executor().execute(new CommandContext(commandSender, match.ctx()));
-            return true;
+        for(Command command :  commands) {
+            CommandMatcher.MatchResult result = commandMatcher.match(command,  commandSender, tokens);
+            switch (result) {
+                case CommandMatcher.MatchResult.Match(Command cmd, Map<String, Object> ctx) -> {
+                    cmd.executor().execute(new CommandContext(commandSender, ctx));
+                    return true;
+                }
+                case CommandMatcher.MatchResult.NoMatch noMatch -> failedCommands.add(noMatch);
+            }
         }
 
-        List<CommandMatcher.MatchResult.NoMatch> remaining = matches.stream()
-                .filter(matchResult -> matchResult instanceof CommandMatcher.MatchResult.NoMatch)
-                .map(CommandMatcher.MatchResult.NoMatch.class::cast)
-                .toList();
-
         // Find the most likely failed match
-        Optional<CommandMatcher.MatchResult.NoMatch> bestMatch = matches.stream()
-                .filter(CommandMatcher.MatchResult.NoMatch.class::isInstance)
-                .map(CommandMatcher.MatchResult.NoMatch.class::cast)
+        Optional<CommandMatcher.MatchResult.NoMatch> bestMatch = failedCommands.stream()
                 .max(Comparator.comparing(CommandMatcher.MatchResult.NoMatch::matchProgress));
 
         bestMatch.ifPresent(match ->
