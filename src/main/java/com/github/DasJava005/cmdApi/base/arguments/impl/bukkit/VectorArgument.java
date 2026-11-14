@@ -23,10 +23,6 @@ public final class VectorArgument extends TypeArgument<Vector> {
 
     @Override
     public ParseResult<Vector> parse(String[] tokens) {
-        if(tokens.length != REQUIRED_TOKENS) {
-            return ParseResult.insufficientTokens(3, tokens.length);
-        }
-
         double[] components = new double[tokens.length];
         for (int i = 0; i < tokens.length; i++) {
             try{

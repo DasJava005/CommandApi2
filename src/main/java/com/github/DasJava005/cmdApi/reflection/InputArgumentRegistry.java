@@ -3,7 +3,7 @@ package com.github.DasJava005.cmdApi.reflection;
 import com.github.DasJava005.cmdApi.base.arguments.TypeArgument;
 import com.github.DasJava005.cmdApi.base.arguments.TypeArgumentFactory;
 import com.github.DasJava005.cmdApi.base.arguments.TypeArguments;
-import com.github.DasJava005.cmdApi.reflection.utils.Primitives;
+import com.github.DasJava005.cmdApi.utils.Primitives;
 
 import java.util.HashMap;
 import java.util.Map;

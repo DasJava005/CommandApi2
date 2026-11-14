@@ -2,7 +2,8 @@ package com.github.DasJava005.cmdApi.base.registry;
 
 import com.github.DasJava005.cmdApi.base.*;
 import com.github.DasJava005.cmdApi.base.builder.CommandBuilder;
-import com.github.DasJava005.cmdApi.base.registry.dispatcher.CommandDispatcher;
+import com.github.DasJava005.cmdApi.base.integration.CommandDispatcher;
+import com.github.DasJava005.cmdApi.base.integration.CommandTabCompleter;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.CommandSender;

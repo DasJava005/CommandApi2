@@ -1,4 +1,4 @@
-package com.github.DasJava005.cmdApi.reflection.utils;
+package com.github.DasJava005.cmdApi.utils;
 
 public final class Primitives {
 
